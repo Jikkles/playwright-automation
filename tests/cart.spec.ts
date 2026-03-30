@@ -34,13 +34,13 @@ test.describe('Add to Cart', () => {
   test('should update cart badge count as items are added', async ({ page }) => {
     const inventoryPage = new InventoryPage(page);
 
-    await inventoryPage.addToCartButtons.nth(0).click();
+    await inventoryPage.addToCartButtons.first().click();
     expect(await inventoryPage.getCartBadgeCount()).toBe('1');
 
-    await inventoryPage.addToCartButtons.nth(1).click();
+    await inventoryPage.addToCartButtons.first().click();
     expect(await inventoryPage.getCartBadgeCount()).toBe('2');
 
-    await inventoryPage.addToCartButtons.nth(2).click();
+    await inventoryPage.addToCartButtons.first().click();
     expect(await inventoryPage.getCartBadgeCount()).toBe('3');
   });
 
@@ -57,8 +57,8 @@ test.describe('Add to Cart', () => {
     const inventoryPage = new InventoryPage(page);
 
     const itemNames = await inventoryPage.getItemNames();
-    await inventoryPage.addToCartButtons.nth(0).click();
-    await inventoryPage.addToCartButtons.nth(1).click();
+    await inventoryPage.addToCartButtons.first().click();
+    await inventoryPage.addToCartButtons.first().click();
 
     await inventoryPage.goToCart();
 
