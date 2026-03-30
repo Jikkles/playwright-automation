@@ -6,6 +6,9 @@ export class LoginPage {
   readonly passwordInput: Locator;
   readonly loginButton: Locator;
   readonly errorMessage: Locator;
+  readonly errorCloseButton: Locator;
+  readonly loginLogo: Locator;
+  readonly loginContainer: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -13,6 +16,9 @@ export class LoginPage {
     this.passwordInput = page.locator('[data-test="password"]');
     this.loginButton = page.locator('[data-test="login-button"]');
     this.errorMessage = page.locator('[data-test="error"]');
+    this.errorCloseButton = page.locator('[data-test="error"] button');
+    this.loginLogo = page.locator('.login_logo');
+    this.loginContainer = page.locator('.login_container');
   }
 
   async goto() {
@@ -27,5 +33,25 @@ export class LoginPage {
 
   async loginAsStandardUser() {
     await this.login('standard_user', 'secret_sauce');
+  }
+
+  async loginAsLockedOutUser() {
+    await this.login('locked_out_user', 'secret_sauce');
+  }
+
+  async loginAsProblemUser() {
+    await this.login('problem_user', 'secret_sauce');
+  }
+
+  async loginAsPerformanceGlitchUser() {
+    await this.login('performance_glitch_user', 'secret_sauce');
+  }
+
+  async getErrorMessageText(): Promise<string | null> {
+    return await this.errorMessage.textContent();
+  }
+
+  async dismissError() {
+    await this.errorCloseButton.click();
   }
 }
