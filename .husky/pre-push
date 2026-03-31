@@ -1,0 +1,11 @@
+echo "Running Playwright tests before push..."
+
+npx playwright test
+
+if [ $? -ne 0 ]; then
+  echo ""
+  echo "Push blocked: Playwright tests failed. Fix the failing tests before pushing."
+  exit 1
+fi
+
+echo "All tests passed. Proceeding with push."
