@@ -1,4 +1,5 @@
 import { Page, Locator } from '@playwright/test';
+import { credentials } from '../data/credentials';
 
 export class LoginPage {
   readonly page: Page;
@@ -32,19 +33,19 @@ export class LoginPage {
   }
 
   async loginAsStandardUser() {
-    await this.login('standard_user', 'secret_sauce');
+    await this.login(credentials.standardUser.username, credentials.standardUser.password);
   }
 
   async loginAsLockedOutUser() {
-    await this.login('locked_out_user', 'secret_sauce');
+    await this.login(credentials.lockedOutUser.username, credentials.lockedOutUser.password);
   }
 
   async loginAsProblemUser() {
-    await this.login('problem_user', 'secret_sauce');
+    await this.login(credentials.problemUser.username, credentials.problemUser.password);
   }
 
   async loginAsPerformanceGlitchUser() {
-    await this.login('performance_glitch_user', 'secret_sauce');
+    await this.login(credentials.performanceGlitchUser.username, credentials.performanceGlitchUser.password);
   }
 
   async getErrorMessageText(): Promise<string | null> {

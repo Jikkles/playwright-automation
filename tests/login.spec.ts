@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { LoginPage } from '../pages/LoginPage';
 import { InventoryPage } from '../pages/InventoryPage';
+import { credentials } from '../data/credentials';
 
 test.describe('Login Page', () => {
 
@@ -49,7 +50,7 @@ test.describe('Login Page', () => {
     const loginPage = new LoginPage(page);
     await loginPage.goto();
 
-    await loginPage.login('', 'secret_sauce');
+    await loginPage.login('', credentials.standardUser.password);
     await expect(loginPage.errorMessage).toBeVisible();
     const errorText = await loginPage.getErrorMessageText();
     expect(errorText).toContain('Username is required');
@@ -59,7 +60,7 @@ test.describe('Login Page', () => {
     const loginPage = new LoginPage(page);
     await loginPage.goto();
 
-    await loginPage.login('standard_user', '');
+    await loginPage.login(credentials.standardUser.username, '');
     await expect(loginPage.errorMessage).toBeVisible();
     const errorText = await loginPage.getErrorMessageText();
     expect(errorText).toContain('Password is required');
