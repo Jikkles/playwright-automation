@@ -47,9 +47,8 @@ export class InventoryPage {
     await this.cartIcon.click();
   }
 
-  async getCartBadgeCount(): Promise<number> {
-    const text = await this.cartBadge.textContent();
-    return text ? parseInt(text, 10) : 0;
+  async getCartBadgeCount(): Promise<string> {
+    return await this.cartBadge.textContent() ?? '0';
   }
 
   async getInventoryItemCount(): Promise<number> {
