@@ -47,12 +47,13 @@ export class InventoryPage {
     await this.cartIcon.click();
   }
 
-  async getCartBadgeCount(): Promise<string | null> {
-    return await this.cartBadge.textContent();
+  async getCartBadgeCount(): Promise<number> {
+    const text = await this.cartBadge.textContent();
+    return text ? parseInt(text, 10) : 0;
   }
 
   async getInventoryItemCount(): Promise<number> {
-    return await this.inventoryItems.count();
+    return this.inventoryItems.count();
   }
 
   async sortBy(option: 'az' | 'za' | 'lohi' | 'hilo') {
@@ -60,7 +61,7 @@ export class InventoryPage {
   }
 
   async getItemNames(): Promise<string[]> {
-    return await this.inventoryItemNames.allTextContents();
+    return this.inventoryItemNames.allTextContents();
   }
 
   async getItemPrices(): Promise<number[]> {

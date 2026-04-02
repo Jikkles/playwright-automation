@@ -49,7 +49,7 @@ export class LoginPage {
   }
 
   async getErrorMessageText(): Promise<string | null> {
-    return await this.errorMessage.textContent();
+    return this.errorMessage.textContent();
   }
 
   async dismissError() {
