@@ -15,6 +15,12 @@ test.describe('Login Page', () => {
     await expect(loginPage.loginButton).toBeVisible();
   });
 
+  test('should display the login container', async ({ page }) => {
+    const loginPage = new LoginPage(page);
+    await loginPage.goto();
+    await expect(loginPage.loginContainer).toBeVisible();
+  });
+
   test('should login with valid credentials', async ({ page }) => {
     const loginPage = new LoginPage(page);
     await loginPage.goto();

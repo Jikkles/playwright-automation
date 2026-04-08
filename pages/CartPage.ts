@@ -31,6 +31,15 @@ export class CartPage {
     return this.cartItemNames.allTextContents();
   }
 
+  async getCartItemPrices(): Promise<number[]> {
+    const priceTexts = await this.cartItemPrices.allTextContents();
+    return priceTexts.map(p => parseFloat(p.replace('$', '')));
+  }
+
+  async getCartItemQuantities(): Promise<string[]> {
+    return this.cartItemQuantities.allTextContents();
+  }
+
   async removeItemByName(name: string) {
     await this.page.locator(`[data-test="remove-${name.toLowerCase().replace(/ /g, '-')}"]`).click();
   }

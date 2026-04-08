@@ -3,6 +3,8 @@ import { LoginPage } from '../pages/LoginPage';
 import { InventoryPage } from '../pages/InventoryPage';
 import { CartPage } from '../pages/CartPage';
 
+const EXPECTED_ITEM_COUNT = 6;
+
 test.describe('Inventory Page', () => {
 
   test.beforeEach(async ({ page }) => {
@@ -21,7 +23,7 @@ test.describe('Inventory Page', () => {
   test('should display 6 products', async ({ page }) => {
     const inventoryPage = new InventoryPage(page);
     const itemCount = await inventoryPage.getInventoryItemCount();
-    expect(itemCount).toBe(6);
+    expect(itemCount).toBe(EXPECTED_ITEM_COUNT);
   });
 
   test('should add item to cart and view it', async ({ page }) => {
@@ -113,6 +115,23 @@ test.describe('Inventory Page', () => {
 
     const cartPage = new CartPage(page);
     await expect(cartPage.pageTitle).toHaveText('Your Cart');
+  });
+
+  test('should display correct page title', async ({ page }) => {
+    const inventoryPage = new InventoryPage(page);
+    await expect(inventoryPage.pageTitle).toHaveText('Products');
+  });
+
+  test('should display descriptions for all items', async ({ page }) => {
+    const inventoryPage = new InventoryPage(page);
+    const descriptions = await inventoryPage.getItemDescriptions();
+    expect(descriptions.length).toBe(EXPECTED_ITEM_COUNT);
+    descriptions.forEach(desc => expect(desc.trim()).not.toBe(''));
+  });
+
+  test('should display the burger menu button', async ({ page }) => {
+    const inventoryPage = new InventoryPage(page);
+    await expect(inventoryPage.burgerMenuButton).toBeVisible();
   });
 
 });
