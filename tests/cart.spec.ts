@@ -75,6 +75,31 @@ test.describe('Add to Cart', () => {
     await expect(inventoryPage.cartBadge).not.toBeVisible();
   });
 
+  test('should display correct item price in cart', async ({ page }) => {
+    const inventoryPage = new InventoryPage(page);
+    // Prices are fetched before adding to cart; index 0 corresponds to the first item added
+    const inventoryPrices = await inventoryPage.getItemPrices();
+    await inventoryPage.addFirstItemToCart();
+    await inventoryPage.goToCart();
+
+    const cartPage = new CartPage(page);
+    const cartPrices = await cartPage.getCartItemPrices();
+    expect(cartPrices[0]).toBe(inventoryPrices[0]);
+  });
+
+  test('should display quantity of 1 for each item in cart', async ({ page }) => {
+    const inventoryPage = new InventoryPage(page);
+    const itemNames = await inventoryPage.getItemNames();
+    await inventoryPage.addItemToCartByName(itemNames[0]);
+    await inventoryPage.addItemToCartByName(itemNames[1]);
+    await inventoryPage.goToCart();
+
+    const cartPage = new CartPage(page);
+    const quantities = await cartPage.getCartItemQuantities();
+    expect(quantities.length).toBe(2);
+    quantities.forEach(qty => expect(qty).toBe('1'));
+  });
+
   test('should persist cart contents after navigating back from cart', async ({ page }) => {
     const inventoryPage = new InventoryPage(page);
 
