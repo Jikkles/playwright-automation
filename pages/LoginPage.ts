@@ -45,19 +45,14 @@ export class LoginPage {
   }
 
   async loginAsPerformanceGlitchUser(): Promise<void> {
-    await this.login(credentials.performanceGlitchUser.username, credentials.performanceGlitchUser.password);
+    await this.login(
+      credentials.performanceGlitchUser.username,
+      credentials.performanceGlitchUser.password
+    );
   }
 
   async loginAsErrorUser(): Promise<void> {
     await this.login(credentials.errorUser.username, credentials.errorUser.password);
-  }
-
-  async loginAsVisualUser(): Promise<void> {
-    await this.login(credentials.visualUser.username, credentials.visualUser.password);
-  }
-
-  async getErrorMessageText(): Promise<string | null> {
-    return this.errorMessage.textContent();
   }
 
   async dismissError(): Promise<void> {

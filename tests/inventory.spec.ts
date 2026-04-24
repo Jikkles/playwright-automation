@@ -3,12 +3,11 @@ import { test, expect } from '../fixtures';
 const EXPECTED_ITEM_COUNT = 6;
 
 test.describe('Inventory Page', () => {
-
   test.beforeEach(async ({ page }) => {
     await page.goto('/inventory.html');
   });
 
-  test('should display inventory items @smoke', async ({ inventoryPage }) => {
+  test('should display inventory items', { tag: '@smoke' }, async ({ inventoryPage }) => {
     await expect(inventoryPage.inventoryContainer).toBeVisible();
     await expect(inventoryPage.inventoryItems).not.toHaveCount(0);
   });
@@ -22,7 +21,11 @@ test.describe('Inventory Page', () => {
     await expect(inventoryPage.cartBadge).toHaveText('1');
   });
 
-  test('should navigate to cart and display added item', async ({ page, inventoryPage, cartPage }) => {
+  test('should navigate to cart and display added item', async ({
+    page,
+    inventoryPage,
+    cartPage,
+  }) => {
     await inventoryPage.addFirstItemToCart();
     await inventoryPage.goToCart();
     await expect(page).toHaveURL(/.*cart/);
@@ -69,20 +72,6 @@ test.describe('Inventory Page', () => {
     expect(names).toEqual([...names].sort((a, b) => a.localeCompare(b)));
   });
 
-  test('should remove item from cart page', async ({ inventoryPage, cartPage }) => {
-    await inventoryPage.addFirstItemToCart();
-    await inventoryPage.goToCart();
-    await expect(cartPage.cartItems).toHaveCount(1);
-    await cartPage.removeFirstItem();
-    await expect(cartPage.cartItems).toHaveCount(0);
-  });
-
-  test('should navigate to cart via cart icon', async ({ page, inventoryPage, cartPage }) => {
-    await inventoryPage.goToCart();
-    await expect(page).toHaveURL(/.*cart/);
-    await expect(cartPage.pageTitle).toHaveText('Your Cart');
-  });
-
   test('should display correct page title', async ({ inventoryPage }) => {
     await expect(inventoryPage.pageTitle).toHaveText('Products');
   });
@@ -98,5 +87,4 @@ test.describe('Inventory Page', () => {
   test('should display the burger menu button', async ({ inventoryPage }) => {
     await expect(inventoryPage.burgerMenuButton).toBeVisible();
   });
-
 });

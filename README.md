@@ -4,14 +4,14 @@ An end-to-end test automation framework built with Playwright and TypeScript, de
 
 ## 🧰 Tech Stack
 
-| Tool | Purpose |
-|---|---|
-| [Playwright](https://playwright.dev/) | Browser automation & test runner |
-| TypeScript | Strongly-typed test authoring |
-| ESLint + eslint-plugin-playwright | Static analysis and Playwright-specific lint rules |
-| Prettier | Consistent code formatting |
-| GitHub Actions | CI/CD pipeline |
-| HTML Reporter | Test result reporting |
+| Tool                                  | Purpose                                            |
+| ------------------------------------- | -------------------------------------------------- |
+| [Playwright](https://playwright.dev/) | Browser automation & test runner                   |
+| TypeScript                            | Strongly-typed test authoring                      |
+| ESLint + eslint-plugin-playwright     | Static analysis and Playwright-specific lint rules |
+| Prettier                              | Consistent code formatting                         |
+| GitHub Actions                        | CI/CD pipeline                                     |
+| HTML Reporter                         | Test result reporting                              |
 
 ## 🏗️ Project Structure
 
