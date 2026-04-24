@@ -26,7 +26,7 @@ jobs:
 
   test:
     needs: quality
-    timeout-minutes: 15
+    timeout-minutes: 30
     runs-on: ubuntu-24.04
     env:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
@@ -42,18 +42,40 @@ jobs:
         id: playwright-cache
         with:
           path: ~/.cache/ms-playwright
-          key: playwright-${{ runner.os }}-chromium-firefox-${{ hashFiles('package-lock.json') }}
+          key: playwright-${{ runner.os }}-${{ hashFiles('package-lock.json', 'playwright.config.ts') }}
       - name: Install Playwright browsers and deps
         if: steps.playwright-cache.outputs.cache-hit != 'true'
-        run: npx playwright install chromium firefox --with-deps
+        run: npx playwright install chromium firefox webkit --with-deps
       - name: Install Playwright system deps only
         if: steps.playwright-cache.outputs.cache-hit == 'true'
-        run: npx playwright install-deps chromium firefox
+        run: npx playwright install-deps chromium firefox webkit
+      - name: Restore Allure history
+        uses: actions/cache/restore@v4
+        with:
+          path: allure-results/history
+          key: allure-history-${{ github.run_number }}
+          restore-keys: |
+            allure-history-
       - name: Run Playwright tests
         run: npx playwright test
+      - name: Generate Allure report
+        if: ${{ !cancelled() }}
+        run: npx allure generate allure-results --clean -o allure-report
+      - name: Save Allure history
+        uses: actions/cache/save@v4
+        if: ${{ !cancelled() }}
+        with:
+          path: allure-report/history
+          key: allure-history-${{ github.run_number }}
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:
           name: playwright-report
           path: playwright-report/
+          retention-days: 5
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: allure-report
+          path: allure-report/
           retention-days: 5
