@@ -9,7 +9,7 @@ test.describe('Login Page', () => {
     await loginPage.goto();
   });
 
-  test('should load the login page @smoke', async ({ page, loginPage }) => {
+  test('should load the login page', { tag: '@smoke' }, async ({ page, loginPage }) => {
     await expect(page).toHaveURL('/');
     await expect(loginPage.loginLogo).toBeVisible();
     await expect(loginPage.loginContainer).toBeVisible();
@@ -18,11 +18,15 @@ test.describe('Login Page', () => {
     await expect(loginPage.loginButton).toBeVisible();
   });
 
-  test('should login with valid credentials @smoke', async ({ page, loginPage, inventoryPage }) => {
-    await loginPage.loginAsStandardUser();
-    await expect(page).toHaveURL('/inventory.html');
-    await expect(inventoryPage.inventoryContainer).toBeVisible();
-  });
+  test(
+    'should login with valid credentials',
+    { tag: '@smoke' },
+    async ({ page, loginPage, inventoryPage }) => {
+      await loginPage.loginAsStandardUser();
+      await expect(page).toHaveURL('/inventory.html');
+      await expect(inventoryPage.inventoryContainer).toBeVisible();
+    }
+  );
 
   test('should show error for invalid credentials', async ({ loginPage }) => {
     await loginPage.login('invalid_user', 'wrong_password');
@@ -50,5 +54,4 @@ test.describe('Login Page', () => {
     await loginPage.dismissError();
     await expect(loginPage.errorMessage).toBeHidden();
   });
-
 });

@@ -15,7 +15,13 @@ module.exports = [
     },
   },
   {
-    ignores: ['node_modules/', 'playwright-report/', 'test-results/', '.auth/', 'eslint.config.cjs'],
+    ignores: [
+      'node_modules/',
+      'playwright-report/',
+      'test-results/',
+      '.auth/',
+      'eslint.config.cjs',
+    ],
   },
   eslintConfigPrettier,
 ];

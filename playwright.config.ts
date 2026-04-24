@@ -6,6 +6,7 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
   workers: process.env.CI ? 4 : 2,
+  timeout: 60_000,
   reporter: process.env.CI
     ? [['html'], ['json', { outputFile: 'test-results/results.json' }], ['github']]
     : [['html']],
@@ -13,6 +14,8 @@ export default defineConfig({
   use: {
     baseURL: process.env.BASE_URL ?? 'https://www.saucedemo.com/',
     testIdAttribute: 'data-test',
+    actionTimeout: 10_000,
+    navigationTimeout: 30_000,
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',

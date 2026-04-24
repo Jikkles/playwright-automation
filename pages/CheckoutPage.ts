@@ -1,8 +1,7 @@
 import { Page, Locator } from '@playwright/test';
+import { BasePage } from './BasePage';
 
-export class CheckoutPage {
-  readonly page: Page;
-
+export class CheckoutPage extends BasePage {
   // Step 1 — Your Information
   readonly firstNameInput: Locator;
   readonly lastNameInput: Locator;
@@ -12,9 +11,7 @@ export class CheckoutPage {
   readonly errorMessage: Locator;
 
   // Step 2 — Overview
-  readonly overviewItems: Locator;
   readonly overviewItemNames: Locator;
-  readonly overviewItemPrices: Locator;
   readonly subtotalLabel: Locator;
   readonly taxLabel: Locator;
   readonly totalLabel: Locator;
@@ -22,14 +19,10 @@ export class CheckoutPage {
 
   // Complete
   readonly confirmationHeader: Locator;
-  readonly confirmationText: Locator;
   readonly backToProductsButton: Locator;
 
-  // Shared
-  readonly pageTitle: Locator;
-
   constructor(page: Page) {
-    this.page = page;
+    super(page);
 
     this.firstNameInput = page.locator('[data-test="firstName"]');
     this.lastNameInput = page.locator('[data-test="lastName"]');
@@ -38,19 +31,14 @@ export class CheckoutPage {
     this.cancelButton = page.locator('[data-test="cancel"]');
     this.errorMessage = page.locator('[data-test="error"]');
 
-    this.overviewItems = page.locator('.cart_item'); // no data-test on the cart row wrapper
     this.overviewItemNames = page.locator('[data-test="inventory-item-name"]');
-    this.overviewItemPrices = page.locator('[data-test="inventory-item-price"]');
     this.subtotalLabel = page.locator('[data-test="subtotal-label"]');
     this.taxLabel = page.locator('[data-test="tax-label"]');
     this.totalLabel = page.locator('[data-test="total-label"]');
     this.finishButton = page.locator('[data-test="finish"]');
 
     this.confirmationHeader = page.locator('[data-test="complete-header"]');
-    this.confirmationText = page.locator('[data-test="complete-text"]');
     this.backToProductsButton = page.locator('[data-test="back-to-products"]');
-
-    this.pageTitle = page.locator('[data-test="title"]');
   }
 
   async fillCustomerInfo(firstName: string, lastName: string, postalCode: string): Promise<void> {
@@ -80,7 +68,7 @@ export class CheckoutPage {
   }
 
   private async parseCurrencyLabel(locator: Locator): Promise<number> {
-    const text = await locator.textContent() ?? '';
+    const text = (await locator.textContent()) ?? '';
     const match = text.match(/\$(\d+\.\d{2})/);
     return match ? parseFloat(match[1]) : NaN;
   }

@@ -1,15 +1,14 @@
 import { test, expect } from '../fixtures';
 
-test.describe('Add to Cart', () => {
-
+test.describe('Cart', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/inventory.html');
   });
 
-  test('should add a single item to cart @smoke', async ({ inventoryPage }) => {
+  test('should add a single item to cart', { tag: '@smoke' }, async ({ inventoryPage }) => {
     await inventoryPage.addFirstItemToCart();
     await expect(inventoryPage.cartBadge).toBeVisible();
-    expect(await inventoryPage.getCartBadgeCount()).toBe('1');
+    expect(await inventoryPage.getCartBadgeCount()).toBe(1);
   });
 
   test('should add all items to cart', async ({ inventoryPage }) => {
@@ -17,20 +16,20 @@ test.describe('Add to Cart', () => {
     for (const name of itemNames) {
       await inventoryPage.addItemToCartByName(name);
     }
-    expect(await inventoryPage.getCartBadgeCount()).toBe(String(itemNames.length));
+    expect(await inventoryPage.getCartBadgeCount()).toBe(itemNames.length);
   });
 
   test('should update cart badge count as items are added', async ({ inventoryPage }) => {
     const itemNames = await inventoryPage.getItemNames();
 
     await inventoryPage.addItemToCartByName(itemNames[0]);
-    expect(await inventoryPage.getCartBadgeCount()).toBe('1');
+    expect(await inventoryPage.getCartBadgeCount()).toBe(1);
 
     await inventoryPage.addItemToCartByName(itemNames[1]);
-    expect(await inventoryPage.getCartBadgeCount()).toBe('2');
+    expect(await inventoryPage.getCartBadgeCount()).toBe(2);
 
     await inventoryPage.addItemToCartByName(itemNames[2]);
-    expect(await inventoryPage.getCartBadgeCount()).toBe('3');
+    expect(await inventoryPage.getCartBadgeCount()).toBe(3);
   });
 
   test('should change button text to Remove after adding item', async ({ inventoryPage }) => {
@@ -65,7 +64,10 @@ test.describe('Add to Cart', () => {
     expect(cartPrices[0]).toBe(inventoryPrices[0]);
   });
 
-  test('should display quantity of 1 for each item in cart', async ({ inventoryPage, cartPage }) => {
+  test('should display quantity of 1 for each item in cart', async ({
+    inventoryPage,
+    cartPage,
+  }) => {
     const itemNames = await inventoryPage.getItemNames();
     await inventoryPage.addItemToCartByName(itemNames[0]);
     await inventoryPage.addItemToCartByName(itemNames[1]);
@@ -76,13 +78,30 @@ test.describe('Add to Cart', () => {
     quantities.forEach((qty) => expect(qty).toBe('1'));
   });
 
-  test('should persist cart contents after navigating back from cart', async ({ page, inventoryPage, cartPage }) => {
+  test('should persist cart contents after navigating back from cart', async ({
+    page,
+    inventoryPage,
+    cartPage,
+  }) => {
     await inventoryPage.addFirstItemToCart();
     await inventoryPage.goToCart();
     await cartPage.continueShopping();
 
     await expect(page).toHaveURL('/inventory.html');
-    expect(await inventoryPage.getCartBadgeCount()).toBe('1');
+    expect(await inventoryPage.getCartBadgeCount()).toBe(1);
   });
 
+  test('should navigate to cart page via cart icon', async ({ page, inventoryPage, cartPage }) => {
+    await inventoryPage.goToCart();
+    await expect(page).toHaveURL(/.*cart/);
+    await expect(cartPage.pageTitle).toHaveText('Your Cart');
+  });
+
+  test('should remove item from cart page', async ({ inventoryPage, cartPage }) => {
+    await inventoryPage.addFirstItemToCart();
+    await inventoryPage.goToCart();
+    await expect(cartPage.cartItems).toHaveCount(1);
+    await cartPage.removeFirstItem();
+    await expect(cartPage.cartItems).toHaveCount(0);
+  });
 });

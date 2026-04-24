@@ -27,7 +27,9 @@ test.describe('Problem User - Degraded UX', () => {
     expect(names).not.toEqual(expectedZA);
   });
 
-  test('sort by price low to high does not reorder items (known bug)', async ({ inventoryPage }) => {
+  test('sort by price low to high does not reorder items (known bug)', async ({
+    inventoryPage,
+  }) => {
     await inventoryPage.sortBy('lohi');
     const prices = await inventoryPage.getItemPrices();
     const isSorted = prices.every((p, i) => i === 0 || p >= prices[i - 1]);
@@ -37,8 +39,16 @@ test.describe('Problem User - Degraded UX', () => {
 
   // problem_user's last name field silently ignores input — fillCustomerInfo succeeds
   // but the form cannot advance to step 2, causing this test to fail as expected.
-  test('filling customer info fails silently — known bug', async ({ page, inventoryPage, cartPage, checkoutPage }) => {
-    test.fail(true, 'problem_user last name field silently drops input — remove once upstream bug is fixed');
+  test('filling customer info fails silently — known bug', async ({
+    page,
+    inventoryPage,
+    cartPage,
+    checkoutPage,
+  }) => {
+    test.fixme(
+      true,
+      'problem_user last name field silently drops input — remove once upstream bug is fixed'
+    );
 
     await inventoryPage.addFirstItemToCart();
     await inventoryPage.goToCart();
@@ -48,7 +58,6 @@ test.describe('Problem User - Degraded UX', () => {
     await checkoutPage.continue();
     await expect(page).toHaveURL('/checkout-step-two.html');
   });
-
 });
 
 test.describe('Performance Glitch User', () => {
@@ -68,5 +77,4 @@ test.describe('Performance Glitch User', () => {
     await expect(inventoryPage.inventoryContainer).toBeVisible();
     await expect(inventoryPage.inventoryItems).toHaveCount(6);
   });
-
 });

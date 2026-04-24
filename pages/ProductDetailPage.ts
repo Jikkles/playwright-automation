@@ -1,7 +1,7 @@
 import { Page, Locator } from '@playwright/test';
+import { BasePage } from './BasePage';
 
-export class ProductDetailPage {
-  readonly page: Page;
+export class ProductDetailPage extends BasePage {
   readonly container: Locator;
   readonly itemName: Locator;
   readonly itemDescription: Locator;
@@ -12,7 +12,7 @@ export class ProductDetailPage {
   readonly backButton: Locator;
 
   constructor(page: Page) {
-    this.page = page;
+    super(page);
     // SauceDemo provides no data-test attributes on detail page elements;
     // CSS class selectors are the only stable option for this entire page object.
     this.container = page.locator('.inventory_details_container');
@@ -38,15 +38,15 @@ export class ProductDetailPage {
   }
 
   async getItemName(): Promise<string> {
-    return await this.itemName.textContent() ?? '';
+    return (await this.itemName.textContent()) ?? '';
   }
 
   async getItemPrice(): Promise<number> {
-    const text = await this.itemPrice.textContent() ?? '';
+    const text = (await this.itemPrice.textContent()) ?? '';
     return parseFloat(text.replace('$', ''));
   }
 
   async getItemDescription(): Promise<string> {
-    return await this.itemDescription.textContent() ?? '';
+    return (await this.itemDescription.textContent()) ?? '';
   }
 }

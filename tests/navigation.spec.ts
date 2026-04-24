@@ -1,7 +1,6 @@
 import { test, expect } from '../fixtures';
 
 test.describe('Navigation - Burger Menu', () => {
-
   test.beforeEach(async ({ page }) => {
     await page.goto('/inventory.html');
   });
@@ -25,10 +24,14 @@ test.describe('Navigation - Burger Menu', () => {
     await expect(inventoryPage.cartBadge).toBeHidden();
   });
 
-  test('should navigate back to inventory via All Items link', async ({ page, inventoryPage }) => {
+  test('should navigate back to inventory via All Items link', async ({
+    page,
+    inventoryPage,
+    cartPage,
+  }) => {
     await inventoryPage.goToCart();
     await expect(page).toHaveURL('/cart.html');
-    await inventoryPage.navigateToAllItems();
+    await cartPage.navigateToAllItems();
     await expect(page).toHaveURL('/inventory.html');
     await expect(inventoryPage.inventoryContainer).toBeVisible();
   });
@@ -40,5 +43,4 @@ test.describe('Navigation - Burger Menu', () => {
     await expect(inventoryPage.burgerMenuLogout).toBeHidden();
     await expect(page).toHaveURL('/inventory.html');
   });
-
 });
