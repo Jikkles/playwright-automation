@@ -8,7 +8,12 @@ export default defineConfig({
   workers: process.env.CI ? 4 : 2,
   timeout: 60_000,
   reporter: process.env.CI
-    ? [['html'], ['json', { outputFile: 'test-results/results.json' }], ['github'], ['allure-playwright']]
+    ? [
+        ['html'],
+        ['json', { outputFile: 'test-results/results.json' }],
+        ['github'],
+        ['allure-playwright'],
+      ]
     : [['html'], ['allure-playwright']],
 
   use: {
