@@ -38,19 +38,19 @@ export class CheckoutPage {
     this.cancelButton = page.locator('[data-test="cancel"]');
     this.errorMessage = page.locator('[data-test="error"]');
 
-    this.overviewItems = page.locator('.cart_item');
-    this.overviewItemNames = page.locator('.cart_item .inventory_item_name');
-    this.overviewItemPrices = page.locator('.cart_item .inventory_item_price');
-    this.subtotalLabel = page.locator('.summary_subtotal_label');
-    this.taxLabel = page.locator('.summary_tax_label');
-    this.totalLabel = page.locator('.summary_total_label');
+    this.overviewItems = page.locator('.cart_item'); // no data-test on the cart row wrapper
+    this.overviewItemNames = page.locator('[data-test="inventory-item-name"]');
+    this.overviewItemPrices = page.locator('[data-test="inventory-item-price"]');
+    this.subtotalLabel = page.locator('[data-test="subtotal-label"]');
+    this.taxLabel = page.locator('[data-test="tax-label"]');
+    this.totalLabel = page.locator('[data-test="total-label"]');
     this.finishButton = page.locator('[data-test="finish"]');
 
-    this.confirmationHeader = page.locator('.complete-header');
-    this.confirmationText = page.locator('.complete-text');
+    this.confirmationHeader = page.locator('[data-test="complete-header"]');
+    this.confirmationText = page.locator('[data-test="complete-text"]');
     this.backToProductsButton = page.locator('[data-test="back-to-products"]');
 
-    this.pageTitle = page.locator('.title');
+    this.pageTitle = page.locator('[data-test="title"]');
   }
 
   async fillCustomerInfo(firstName: string, lastName: string, postalCode: string): Promise<void> {
@@ -79,18 +79,20 @@ export class CheckoutPage {
     return this.overviewItemNames.allTextContents();
   }
 
-  async getSubtotal(): Promise<number> {
-    const text = await this.subtotalLabel.textContent() ?? '';
+  private async parseCurrencyLabel(locator: Locator): Promise<number> {
+    const text = await locator.textContent() ?? '';
     return parseFloat(text.replace('$', '').split(':').pop()?.trim() ?? '');
+  }
+
+  async getSubtotal(): Promise<number> {
+    return this.parseCurrencyLabel(this.subtotalLabel);
   }
 
   async getTax(): Promise<number> {
-    const text = await this.taxLabel.textContent() ?? '';
-    return parseFloat(text.replace('$', '').split(':').pop()?.trim() ?? '');
+    return this.parseCurrencyLabel(this.taxLabel);
   }
 
   async getTotal(): Promise<number> {
-    const text = await this.totalLabel.textContent() ?? '';
-    return parseFloat(text.replace('$', '').split(':').pop()?.trim() ?? '');
+    return this.parseCurrencyLabel(this.totalLabel);
   }
 }

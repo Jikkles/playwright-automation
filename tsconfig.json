@@ -6,8 +6,16 @@
     "module": "ESNext",
     "moduleResolution": "bundler",
     "skipLibCheck": true,
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
     "types": ["node"]
   },
-  "include": ["playwright.config.ts", "tests/**/*.ts"],
+  "include": [
+    "playwright.config.ts",
+    "tests/**/*.ts",
+    "pages/**/*.ts",
+    "data/**/*.ts"
+  ],
   "exclude": ["node_modules"]
 }

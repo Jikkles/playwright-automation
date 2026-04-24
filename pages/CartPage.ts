@@ -13,14 +13,14 @@ export class CartPage {
 
   constructor(page: Page) {
     this.page = page;
-    this.cartItems = page.locator('.cart_item');
-    this.cartItemNames = page.locator('.cart_item .inventory_item_name');
-    this.cartItemPrices = page.locator('.cart_item .inventory_item_price');
-    this.cartItemQuantities = page.locator('.cart_item .cart_quantity');
+    this.cartItems = page.locator('.cart_item'); // no data-test on the cart row wrapper
+    this.cartItemNames = page.locator('[data-test="inventory-item-name"]');
+    this.cartItemPrices = page.locator('[data-test="inventory-item-price"]');
+    this.cartItemQuantities = page.locator('[data-test="item-quantity"]');
     this.removeButtons = page.locator('button[data-test*="remove"]');
     this.checkoutButton = page.locator('[data-test="checkout"]');
     this.continueShoppingButton = page.locator('[data-test="continue-shopping"]');
-    this.pageTitle = page.locator('.title');
+    this.pageTitle = page.locator('[data-test="title"]');
   }
 
   async getCartItemCount(): Promise<number> {
@@ -40,19 +40,19 @@ export class CartPage {
     return this.cartItemQuantities.allTextContents();
   }
 
-  async removeItemByName(name: string) {
+  async removeItemByName(name: string): Promise<void> {
     await this.page.locator(`[data-test="remove-${name.toLowerCase().replace(/ /g, '-')}"]`).click();
   }
 
-  async removeFirstItem() {
+  async removeFirstItem(): Promise<void> {
     await this.removeButtons.first().click();
   }
 
-  async proceedToCheckout() {
+  async proceedToCheckout(): Promise<void> {
     await this.checkoutButton.click();
   }
 
-  async continueShopping() {
+  async continueShopping(): Promise<void> {
     await this.continueShoppingButton.click();
   }
 }

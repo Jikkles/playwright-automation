@@ -16,47 +16,43 @@ test.describe('Inventory Page', () => {
   test('should display inventory items', async ({ page }) => {
     const inventoryPage = new InventoryPage(page);
     await expect(inventoryPage.inventoryContainer).toBeVisible();
-    const itemCount = await inventoryPage.getInventoryItemCount();
-    expect(itemCount).toBeGreaterThan(0);
+    await expect(inventoryPage.inventoryItems).not.toHaveCount(0);
   });
 
   test('should display 6 products', async ({ page }) => {
     const inventoryPage = new InventoryPage(page);
-    const itemCount = await inventoryPage.getInventoryItemCount();
-    expect(itemCount).toBe(EXPECTED_ITEM_COUNT);
+    await expect(inventoryPage.inventoryItems).toHaveCount(EXPECTED_ITEM_COUNT);
   });
 
-  test('should add item to cart and view it', async ({ page }) => {
+  test('should show cart badge count of 1 after adding item', async ({ page }) => {
     const inventoryPage = new InventoryPage(page);
-
     await inventoryPage.addFirstItemToCart();
-    const badgeCount = await inventoryPage.getCartBadgeCount();
-    expect(badgeCount).toBe('1');
+    await expect(inventoryPage.cartBadge).toHaveText('1');
+  });
 
+  test('should navigate to cart and display added item', async ({ page }) => {
+    const inventoryPage = new InventoryPage(page);
+    await inventoryPage.addFirstItemToCart();
     await inventoryPage.goToCart();
     await expect(page).toHaveURL(/.*cart/);
 
     const cartPage = new CartPage(page);
-    const itemCount = await cartPage.getCartItemCount();
-    expect(itemCount).toBe(1);
+    await expect(cartPage.cartItems).toHaveCount(1);
   });
 
   test('should add multiple items to cart', async ({ page }) => {
     const inventoryPage = new InventoryPage(page);
 
-    await inventoryPage.addToCartButtons.nth(0).click();
-    await inventoryPage.addToCartButtons.nth(1).click();
-    await inventoryPage.addToCartButtons.nth(2).click();
+    await inventoryPage.addItemsToCart(3);
 
-    const badgeCount = await inventoryPage.getCartBadgeCount();
-    expect(badgeCount).toBe('3');
+    await expect(inventoryPage.cartBadge).toHaveText('3');
   });
 
   test('should remove an item from cart via inventory page', async ({ page }) => {
     const inventoryPage = new InventoryPage(page);
 
     await inventoryPage.addFirstItemToCart();
-    expect(await inventoryPage.getCartBadgeCount()).toBe('1');
+    await expect(inventoryPage.cartBadge).toHaveText('1');
 
     await inventoryPage.removeFirstItemFromCart();
     await expect(inventoryPage.cartBadge).not.toBeVisible();
@@ -65,11 +61,9 @@ test.describe('Inventory Page', () => {
   test('should sort items by name Z to A', async ({ page }) => {
     const inventoryPage = new InventoryPage(page);
 
-    const namesBefore = await inventoryPage.getItemNames();
     await inventoryPage.sortBy('za');
     const namesAfter = await inventoryPage.getItemNames();
 
-    expect(namesAfter).not.toEqual(namesBefore);
     expect(namesAfter).toEqual([...namesAfter].sort((a, b) => b.localeCompare(a)));
   });
 
@@ -95,6 +89,15 @@ test.describe('Inventory Page', () => {
     }
   });
 
+  test('should sort items by name A to Z', async ({ page }) => {
+    const inventoryPage = new InventoryPage(page);
+
+    await inventoryPage.sortBy('az');
+    const names = await inventoryPage.getItemNames();
+
+    expect(names).toEqual([...names].sort((a, b) => a.localeCompare(b)));
+  });
+
   test('should remove item from cart page', async ({ page }) => {
     const inventoryPage = new InventoryPage(page);
 
@@ -102,10 +105,10 @@ test.describe('Inventory Page', () => {
     await inventoryPage.goToCart();
 
     const cartPage = new CartPage(page);
-    expect(await cartPage.getCartItemCount()).toBe(1);
+    await expect(cartPage.cartItems).toHaveCount(1);
 
     await cartPage.removeFirstItem();
-    expect(await cartPage.getCartItemCount()).toBe(0);
+    await expect(cartPage.cartItems).toHaveCount(0);
   });
 
   test('should navigate to cart via cart icon', async ({ page }) => {
@@ -126,7 +129,9 @@ test.describe('Inventory Page', () => {
     const inventoryPage = new InventoryPage(page);
     const descriptions = await inventoryPage.getItemDescriptions();
     expect(descriptions.length).toBe(EXPECTED_ITEM_COUNT);
-    descriptions.forEach(desc => expect(desc.trim()).not.toBe(''));
+    for (const desc of descriptions) {
+      expect(desc.trim()).not.toBe('');
+    }
   });
 
   test('should display the burger menu button', async ({ page }) => {
