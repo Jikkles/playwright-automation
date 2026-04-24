@@ -11,7 +11,8 @@ An end-to-end test automation framework built with Playwright and TypeScript, de
 | ESLint + eslint-plugin-playwright     | Static analysis and Playwright-specific lint rules |
 | Prettier                              | Consistent code formatting                         |
 | GitHub Actions                        | CI/CD pipeline                                     |
-| HTML Reporter                         | Test result reporting                              |
+| HTML Reporter                         | Built-in Playwright test result reporting          |
+| Allure Reporter                       | Rich interactive reporting with history and trends |
 
 ## 🏗️ Project Structure
 
@@ -38,7 +39,7 @@ playwright-automation/
 - **Page Object Model (POM)** — UI interactions encapsulated in dedicated page classes; tests never contain raw selectors or navigation logic
 - **Playwright fixtures** — Page objects injected via `test.extend`, eliminating boilerplate from every spec file
 - **Stored authentication** — `auth.setup.ts` logs in once per browser and saves storage state; subsequent tests skip the UI login entirely
-- **Cross-browser coverage** — Tests run against Chromium and Firefox in parallel, with independent auth state per engine
+- **Cross-browser coverage** — Tests run against Chromium, Firefox, and WebKit (Safari engine) in parallel, with independent auth state per engine
 - **TypeScript** — Full type safety across page objects, fixtures, and test files with strict mode enabled
 - **ESLint + Prettier** — Enforced code quality and consistent formatting, including Playwright-specific rules
 - **Test tagging** — `@smoke` tags on critical-path tests enable fast targeted runs: `npm run test:smoke`
@@ -46,6 +47,7 @@ playwright-automation/
 - **Smart retry logic** — 2 retries in CI, 0 locally for an honest local signal
 - **Failure artefacts** — Screenshots and video automatically captured on failure, traces on first retry
 - **CI/CD pipeline** — Automated runs on every push and PR via GitHub Actions with browser caching
+- **Allure reporting** — Rich interactive reports with step-level timings, inline attachments, and trend history across CI runs
 
 ## 🚀 Getting Started
 
@@ -88,6 +90,12 @@ npm run test:headed
 
 # Open the last HTML report
 npm run test:report
+
+# Generate Allure report from last test run
+npm run allure:generate
+
+# Open the Allure report in a browser
+npm run allure:open
 ```
 
 ### Code Quality
@@ -112,10 +120,10 @@ Tests run against [Sauce Demo](https://www.saucedemo.com/), a purpose-built e-co
 
 ## 📋 CI/CD
 
-Tests execute automatically on every push and pull request to `main` via GitHub Actions on `ubuntu-24.04`. The pipeline caches Playwright browsers by `package-lock.json` hash, runs the full Chromium and Firefox suite with 4 parallel workers, and uploads the HTML report as a build artefact with a 5-day retention window.
+Tests execute automatically on every push and pull request to `main` via GitHub Actions on `ubuntu-24.04`. The pipeline caches Playwright browsers by a hash of `package-lock.json` and `playwright.config.ts` (so the cache auto-invalidates when the browser list changes), runs the full Chromium, Firefox, and WebKit suite with 4 parallel workers, and uploads both the HTML report and Allure report as build artefacts with a 5-day retention window. Allure history is persisted across runs via the Actions cache, enabling trend charts from the second run onward.
 
 ## 🗺️ Roadmap
 
-- [ ] WebKit (Safari) browser coverage
+- [x] WebKit (Safari) browser coverage
 - [ ] API test layer for faster setup and teardown
-- [ ] Allure reporting integration
+- [x] Allure reporting integration
