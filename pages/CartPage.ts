@@ -41,7 +41,8 @@ export class CartPage {
   }
 
   async removeItemByName(name: string): Promise<void> {
-    await this.page.locator(`[data-test="remove-${name.toLowerCase().replace(/ /g, '-')}"]`).click();
+    const item = this.cartItems.filter({ hasText: name });
+    await item.locator('button[data-test*="remove"]').click();
   }
 
   async removeFirstItem(): Promise<void> {

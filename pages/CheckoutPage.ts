@@ -81,7 +81,8 @@ export class CheckoutPage {
 
   private async parseCurrencyLabel(locator: Locator): Promise<number> {
     const text = await locator.textContent() ?? '';
-    return parseFloat(text.replace('$', '').split(':').pop()?.trim() ?? '');
+    const match = text.match(/\$(\d+\.\d{2})/);
+    return match ? parseFloat(match[1]) : NaN;
   }
 
   async getSubtotal(): Promise<number> {
