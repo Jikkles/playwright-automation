@@ -15,7 +15,8 @@
     "playwright.config.ts",
     "tests/**/*.ts",
     "pages/**/*.ts",
-    "data/**/*.ts"
+    "data/**/*.ts",
+    "fixtures/**/*.ts"
   ],
   "exclude": ["node_modules"]
 }
