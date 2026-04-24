@@ -1,38 +1,88 @@
 # Project: Playwright Automation Framework
 
 ## Overview
-A Playwright + TypeScript end-to-end test automation framework built against [SauceDemo](https://www.saucedemo.com/) — a demo e-commerce site used for QA practice. The goal is to learn and build out a proper automation framework with the Page Object Model pattern.
+A Playwright + TypeScript end-to-end test automation framework built against [SauceDemo](https://www.saucedemo.com/) — a demo e-commerce site used for QA practice. Implements the Page Object Model pattern with Playwright fixtures, stored authentication state, and full CI/CD integration.
 
 ## Key Commands
 ```bash
-npx playwright test                  # Run all tests
-npx playwright test tests/login.spec.ts  # Run a specific spec file
-npx playwright test --ui             # Open Playwright UI mode
-npx playwright show-report           # Open the last HTML report
+npm test                             # Run all tests
+npm run test:smoke                   # Run smoke suite only (@smoke tagged tests)
+npm run test:ui                      # Open Playwright UI mode
+npm run test:headed                  # Run tests in headed browser
+npm run test:report                  # Open the last HTML report
+npm run lint                         # Check for lint errors
+npm run lint:fix                     # Auto-fix lint errors
+npm run format                       # Format all files with Prettier
+npm run format:check                 # Check formatting without writing
 ```
 
 ## Architecture
 
-### Pattern: Page Object Model (POM)
-All page interactions are abstracted into classes under `pages/`. Test files in `tests/` import and use these classes — they should not contain raw selectors or navigation logic.
+### Pattern: Page Object Model (POM) + Playwright Fixtures
+All page interactions are abstracted into classes under `pages/`. Tests import the extended `test` object from `fixtures/index.ts`, which injects page objects directly — tests never call `new PageObject(page)` themselves.
 
-- `pages/LoginPage.ts` — login form interactions and credentials
-- `pages/InventoryPage.ts` — product listing page
-- `pages/CartPage.ts` — shopping cart page
-- `tests/login.spec.ts` — login flow tests
-- `tests/inventory.spec.ts` — inventory page tests
-- `tests/cart.spec.ts` — cart tests
+```ts
+// Correct pattern in spec files
+import { test, expect } from '../fixtures';
+
+test('example', async ({ inventoryPage, cartPage }) => {
+  await inventoryPage.addFirstItemToCart();
+  await inventoryPage.goToCart();
+  expect(await cartPage.getCartItemCount()).toBe(1);
+});
+```
+
+### Authentication
+`tests/auth.setup.ts` runs before all other tests. It logs in as `standard_user` and saves the browser storage state to `.auth/user.json`. All specs except `login.spec.ts` and `problem-user.spec.ts` load this state automatically — no UI login required.
+
+Specs that test login flows override the stored state at the describe level:
+```ts
+test.use({ storageState: { cookies: [], origins: [] } });
+```
+
+### File Structure
+```
+fixtures/index.ts          — extended test with all page object fixtures
+tests/auth.setup.ts        — one-time auth setup (runs before all specs)
+pages/                     — Page Object Model classes
+tests/                     — test specifications
+data/credentials.ts        — test user credentials (reads from env vars)
+data/checkout.ts           — customer fixture data
+.env.example               — documents all supported environment variables
+```
 
 ### Config
-- `playwright.config.ts` — base URL is `https://www.saucedemo.com/`, runs Chromium only, HTML reporter, retries on failure, screenshots/video on failure
-- TypeScript configured via `tsconfig.json`
+- `playwright.config.ts` — base URL from `BASE_URL` env var, Chromium, multi-reporter in CI, 4 workers in CI, 0 local retries
+- `tsconfig.json` — strict TypeScript across pages, tests, fixtures, data
+- `eslint.config.cjs` — TypeScript ESLint + Playwright plugin rules
+- `.prettierrc.json` — consistent formatting (single quotes, 100 char width)
+
+## Environment Variables
+Copy `.env.example` to `.env` and override values to target a different environment:
+```
+BASE_URL=https://www.saucedemo.com/
+TEST_PASSWORD=secret_sauce
+STANDARD_USER=standard_user
+```
 
 ## Test Users (SauceDemo)
-- `standard_user` / `secret_sauce` — standard working user
-- `locked_out_user` / `secret_sauce` — locked out user (used for negative testing)
+| User | Notes |
+|---|---|
+| `standard_user` | Normal working user — used by stored auth setup |
+| `locked_out_user` | Cannot log in — used for negative login tests |
+| `problem_user` | Degraded UX — sort broken, last name field silently drops input |
+| `performance_glitch_user` | Artificial ~5s login delay |
+| `error_user` | Some interactions produce errors |
+| `visual_user` | Visual layout differences |
+
+## Test Tagging
+- `@smoke` — critical path, run on every commit: `npm run test:smoke`
+- No tag — full regression suite: `npm test`
 
 ## Conventions
-- Use Page Object classes for all selectors and actions — keep specs clean
-- Tests use `test.describe` blocks grouped by page/feature
-- Screenshots and video are captured automatically on failure (configured in playwright.config.ts)
-- Retries: 1 locally, 2 in CI
+- Import `test` and `expect` from `../fixtures`, never directly from `@playwright/test`
+- Page objects are injected via fixtures — destructure only what the test needs
+- Tests start from a known URL in `beforeEach` (`page.goto('/inventory.html')`)
+- `login.spec.ts` and `problem-user.spec.ts` use `test.use({ storageState: ... })` to clear auth
+- Screenshots, video, and traces captured automatically on failure
+- Retries: 0 locally, 2 in CI

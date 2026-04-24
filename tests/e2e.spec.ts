@@ -1,21 +1,15 @@
-import { test, expect } from '@playwright/test';
-import { LoginPage } from '../pages/LoginPage';
-import { InventoryPage } from '../pages/InventoryPage';
-import { CartPage } from '../pages/CartPage';
-import { CheckoutPage } from '../pages/CheckoutPage';
+import { test, expect } from '../fixtures';
 import { customer } from '../data/checkout';
 
 test.describe('End-to-end: complete purchase flow', () => {
 
-  test('user can browse, add items, and complete checkout', async ({ page }) => {
-    // --- Login ---
-    const loginPage = new LoginPage(page);
-    await loginPage.goto();
-    await loginPage.loginAsStandardUser();
-    await expect(page).toHaveURL('/inventory.html');
-
-    // --- Browse inventory ---
-    const inventoryPage = new InventoryPage(page);
+  test('user can browse, add items, and complete checkout @smoke', async ({
+    page,
+    inventoryPage,
+    cartPage,
+    checkoutPage,
+  }) => {
+    await page.goto('/inventory.html');
     await expect(inventoryPage.inventoryContainer).toBeVisible();
 
     // Sort by price low to high and pick the first two items
@@ -35,8 +29,6 @@ test.describe('End-to-end: complete purchase flow', () => {
     // --- Review cart ---
     await inventoryPage.goToCart();
     await expect(page).toHaveURL('/cart.html');
-
-    const cartPage = new CartPage(page);
     await expect(cartPage.pageTitle).toHaveText('Your Cart');
     expect(await cartPage.getCartItemCount()).toBe(2);
 
@@ -47,8 +39,6 @@ test.describe('End-to-end: complete purchase flow', () => {
     // --- Checkout step 1: customer information ---
     await cartPage.proceedToCheckout();
     await expect(page).toHaveURL('/checkout-step-one.html');
-
-    const checkoutPage = new CheckoutPage(page);
     await expect(checkoutPage.pageTitle).toHaveText('Checkout: Your Information');
     await checkoutPage.fillCustomerInfo(customer.firstName, customer.lastName, customer.postalCode);
     await checkoutPage.continue();
@@ -61,11 +51,9 @@ test.describe('End-to-end: complete purchase flow', () => {
     expect(overviewNames).toContain(expectedItem1);
     expect(overviewNames).toContain(expectedItem2);
 
-    // Verify subtotal matches the prices captured from the inventory page
     const subtotal = await checkoutPage.getSubtotal();
     expect(subtotal).toBe(expectedSubtotal);
 
-    // Verify total = subtotal + tax
     const tax = await checkoutPage.getTax();
     const total = await checkoutPage.getTotal();
     expect(total).toBe(parseFloat((subtotal + tax).toFixed(2)));

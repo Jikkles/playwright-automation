@@ -4,12 +4,15 @@ export default defineConfig({
   testDir: './tests',
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
-  retries: process.env.CI ? 2 : 1,
-  workers: process.env.CI ? 1 : 2,
-  reporter: 'html',
+  retries: process.env.CI ? 2 : 0,
+  workers: process.env.CI ? 4 : undefined,
+  reporter: process.env.CI
+    ? [['html'], ['json', { outputFile: 'test-results/results.json' }], ['github']]
+    : [['html']],
 
   use: {
-    baseURL: 'https://www.saucedemo.com/',
+    baseURL: process.env.BASE_URL ?? 'https://www.saucedemo.com/',
+    testIdAttribute: 'data-test',
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
@@ -17,8 +20,16 @@ export default defineConfig({
 
   projects: [
     {
+      name: 'setup',
+      testMatch: '**/auth.setup.ts',
+    },
+    {
       name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
+      use: {
+        ...devices['Desktop Chrome'],
+        storageState: '.auth/user.json',
+      },
+      dependencies: ['setup'],
     },
   ],
 });
