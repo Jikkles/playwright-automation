@@ -22,37 +22,45 @@ export class LoginPage {
     this.loginContainer = page.locator('.login_container');
   }
 
-  async goto() {
+  async goto(): Promise<void> {
     await this.page.goto('/');
   }
 
-  async login(username: string, password: string) {
+  async login(username: string, password: string): Promise<void> {
     await this.usernameInput.fill(username);
     await this.passwordInput.fill(password);
     await this.loginButton.click();
   }
 
-  async loginAsStandardUser() {
+  async loginAsStandardUser(): Promise<void> {
     await this.login(credentials.standardUser.username, credentials.standardUser.password);
   }
 
-  async loginAsLockedOutUser() {
+  async loginAsLockedOutUser(): Promise<void> {
     await this.login(credentials.lockedOutUser.username, credentials.lockedOutUser.password);
   }
 
-  async loginAsProblemUser() {
+  async loginAsProblemUser(): Promise<void> {
     await this.login(credentials.problemUser.username, credentials.problemUser.password);
   }
 
-  async loginAsPerformanceGlitchUser() {
+  async loginAsPerformanceGlitchUser(): Promise<void> {
     await this.login(credentials.performanceGlitchUser.username, credentials.performanceGlitchUser.password);
+  }
+
+  async loginAsErrorUser(): Promise<void> {
+    await this.login(credentials.errorUser.username, credentials.errorUser.password);
+  }
+
+  async loginAsVisualUser(): Promise<void> {
+    await this.login(credentials.visualUser.username, credentials.visualUser.password);
   }
 
   async getErrorMessageText(): Promise<string | null> {
     return this.errorMessage.textContent();
   }
 
-  async dismissError() {
+  async dismissError(): Promise<void> {
     await this.errorCloseButton.click();
   }
 }

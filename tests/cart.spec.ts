@@ -22,25 +22,26 @@ test.describe('Add to Cart', () => {
 
   test('should add all items to cart', async ({ page }) => {
     const inventoryPage = new InventoryPage(page);
-    const totalItems = await inventoryPage.getInventoryItemCount();
+    const itemNames = await inventoryPage.getItemNames();
 
-    for (let i = 0; i < totalItems; i++) {
-      await inventoryPage.addToCartButtons.first().click();
+    for (const name of itemNames) {
+      await inventoryPage.addItemToCartByName(name);
     }
 
-    expect(await inventoryPage.getCartBadgeCount()).toBe(String(totalItems));
+    expect(await inventoryPage.getCartBadgeCount()).toBe(String(itemNames.length));
   });
 
   test('should update cart badge count as items are added', async ({ page }) => {
     const inventoryPage = new InventoryPage(page);
+    const itemNames = await inventoryPage.getItemNames();
 
-    await inventoryPage.addToCartButtons.first().click();
+    await inventoryPage.addItemToCartByName(itemNames[0]);
     expect(await inventoryPage.getCartBadgeCount()).toBe('1');
 
-    await inventoryPage.addToCartButtons.first().click();
+    await inventoryPage.addItemToCartByName(itemNames[1]);
     expect(await inventoryPage.getCartBadgeCount()).toBe('2');
 
-    await inventoryPage.addToCartButtons.first().click();
+    await inventoryPage.addItemToCartByName(itemNames[2]);
     expect(await inventoryPage.getCartBadgeCount()).toBe('3');
   });
 
@@ -57,8 +58,8 @@ test.describe('Add to Cart', () => {
     const inventoryPage = new InventoryPage(page);
 
     const itemNames = await inventoryPage.getItemNames();
-    await inventoryPage.addToCartButtons.first().click();
-    await inventoryPage.addToCartButtons.first().click();
+    await inventoryPage.addItemToCartByName(itemNames[0]);
+    await inventoryPage.addItemToCartByName(itemNames[1]);
 
     await inventoryPage.goToCart();
 
