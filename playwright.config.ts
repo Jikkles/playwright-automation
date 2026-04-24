@@ -5,7 +5,7 @@ export default defineConfig({
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
-  workers: process.env.CI ? 4 : undefined,
+  workers: process.env.CI ? 4 : 2,
   reporter: process.env.CI
     ? [['html'], ['json', { outputFile: 'test-results/results.json' }], ['github']]
     : [['html']],
@@ -20,16 +20,30 @@ export default defineConfig({
 
   projects: [
     {
-      name: 'setup',
+      name: 'chromium-setup',
       testMatch: '**/auth.setup.ts',
+      use: { ...devices['Desktop Chrome'] },
+    },
+    {
+      name: 'firefox-setup',
+      testMatch: '**/auth.setup.ts',
+      use: { ...devices['Desktop Firefox'] },
     },
     {
       name: 'chromium',
       use: {
         ...devices['Desktop Chrome'],
-        storageState: '.auth/user.json',
+        storageState: '.auth/chromium.json',
       },
-      dependencies: ['setup'],
+      dependencies: ['chromium-setup'],
+    },
+    {
+      name: 'firefox',
+      use: {
+        ...devices['Desktop Firefox'],
+        storageState: '.auth/firefox.json',
+      },
+      dependencies: ['firefox-setup'],
     },
   ],
 });

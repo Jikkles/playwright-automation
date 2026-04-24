@@ -78,7 +78,8 @@ export class InventoryPage {
   }
 
   async addItemToCartByName(name: string): Promise<void> {
-    await this.page.locator(`[data-test="add-to-cart-${name.toLowerCase().replace(/ /g, '-')}"]`).click();
+    const item = this.inventoryItems.filter({ hasText: name });
+    await item.locator('button[data-test*="add-to-cart"]').click();
   }
 
   async removeFirstItemFromCart(): Promise<void> {
