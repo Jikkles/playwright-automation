@@ -43,4 +43,16 @@ test.describe('Navigation - Burger Menu', () => {
     await expect(inventoryPage.burgerMenuLogout).toBeHidden();
     await expect(page).toHaveURL('/inventory.html');
   });
+
+  test('should display all menu options when burger menu is opened', { tag: '@smoke' }, async ({ inventoryPage }) => {
+    // Menu items are rendered but hidden via CSS until the burger is opened
+    await expect(inventoryPage.burgerMenuAllItems).toBeHidden();
+    await expect(inventoryPage.burgerMenuReset).toBeHidden();
+    await expect(inventoryPage.burgerMenuLogout).toBeHidden();
+    await inventoryPage.openBurgerMenu();
+    await expect(inventoryPage.burgerMenuAllItems).toBeVisible();
+    await expect(inventoryPage.burgerMenuReset).toBeVisible();
+    await expect(inventoryPage.burgerMenuLogout).toBeVisible();
+    // Note: the About link is intentionally excluded — no locator exists in BasePage for it
+  });
 });
