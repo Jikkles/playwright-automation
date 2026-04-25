@@ -54,6 +54,7 @@ export abstract class BasePage {
   }
 
   async getCartBadgeCount(): Promise<number> {
+    if (!(await this.cartBadge.isVisible())) return 0;
     const text = (await this.cartBadge.textContent()) ?? '0';
     return parseInt(text, 10);
   }
