@@ -16,12 +16,7 @@ test.describe('Accessibility - Login page', () => {
     test.fixme(true, 'SauceDemo upstream: missing <main> landmark, no <h1> heading, content outside landmark regions');
     await loginPage.goto();
     const results = await new AxeBuilder({ page }).analyze();
-    if (results.violations.length > 0) {
-      const summary = results.violations
-        .map((v) => `[${v.impact}] ${v.id}: ${v.description}`)
-        .join('\n');
-      throw new Error(`Accessibility violations found:\n${summary}`);
-    }
+    expect(results.violations).toHaveLength(0);
   });
 });
 
