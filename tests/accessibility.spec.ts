@@ -13,7 +13,10 @@ test.describe('Accessibility - Login page', () => {
   test.use({ storageState: { cookies: [], origins: [] } });
 
   test('should have no accessibility violations', async ({ page, loginPage }) => {
-    test.fixme(true, 'SauceDemo upstream: missing <main> landmark, no <h1> heading, content outside landmark regions');
+    test.fixme(
+      true,
+      'SauceDemo upstream: missing <main> landmark, no <h1> heading, content outside landmark regions'
+    );
     await loginPage.goto();
     const results = await new AxeBuilder({ page }).analyze();
     expect(results.violations).toHaveLength(0);
@@ -21,8 +24,14 @@ test.describe('Accessibility - Login page', () => {
 });
 
 test.describe('Accessibility - Authenticated pages', () => {
-  test('inventory page should have no accessibility violations', async ({ page, inventoryPage }) => {
-    test.fixme(true, 'SauceDemo upstream: missing landmarks, no <h1>, unlabelled sort dropdown (select-name critical)');
+  test('inventory page should have no accessibility violations', async ({
+    page,
+    inventoryPage,
+  }) => {
+    test.fixme(
+      true,
+      'SauceDemo upstream: missing landmarks, no <h1>, unlabelled sort dropdown (select-name critical)'
+    );
     await page.goto('/inventory.html');
     await inventoryPage.checkAccessibility();
   });
@@ -32,7 +41,10 @@ test.describe('Accessibility - Authenticated pages', () => {
     inventoryPage,
     cartPage,
   }) => {
-    test.fixme(true, 'SauceDemo upstream: missing <main> landmark, no <h1> heading, content outside landmark regions');
+    test.fixme(
+      true,
+      'SauceDemo upstream: missing <main> landmark, no <h1> heading, content outside landmark regions'
+    );
     await page.goto('/inventory.html');
     await inventoryPage.addFirstItemToCart();
     await inventoryPage.goToCart();
@@ -45,7 +57,10 @@ test.describe('Accessibility - Authenticated pages', () => {
     cartPage,
     checkoutPage,
   }) => {
-    test.fixme(true, 'SauceDemo upstream: missing <main> landmark, no <h1> heading, content outside landmark regions');
+    test.fixme(
+      true,
+      'SauceDemo upstream: missing <main> landmark, no <h1> heading, content outside landmark regions'
+    );
     await page.goto('/inventory.html');
     await inventoryPage.addFirstItemToCart();
     await inventoryPage.goToCart();
@@ -60,7 +75,10 @@ test.describe('Accessibility - Authenticated pages', () => {
     cartPage,
     checkoutPage,
   }) => {
-    test.fixme(true, 'SauceDemo upstream: missing <main> landmark, no <h1> heading, content outside landmark regions');
+    test.fixme(
+      true,
+      'SauceDemo upstream: missing <main> landmark, no <h1> heading, content outside landmark regions'
+    );
     await page.goto('/inventory.html');
     await inventoryPage.addFirstItemToCart();
     await inventoryPage.goToCart();

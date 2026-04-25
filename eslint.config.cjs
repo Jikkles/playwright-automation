@@ -9,7 +9,10 @@ module.exports = [
     plugins: { playwright },
     rules: {
       ...playwright.configs['flat/recommended'].rules,
-      'playwright/expect-expect': ['error', { assertFunctionNames: ['expect', 'checkAccessibility'] }],
+      'playwright/expect-expect': [
+        'error',
+        { assertFunctionNames: ['expect', 'checkAccessibility'] },
+      ],
       'playwright/no-wait-for-timeout': 'warn',
       'playwright/no-skipped-test': 'warn',
     },
