@@ -6,8 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "if": "Bash(git commit *)",
-            "command": "git diff --cached --name-only --diff-filter=ACM | grep -E \"\\.(ts|json|md|cjs|yml)$\" | while IFS= read -r f; do npx prettier --write \"$f\" 2>/dev/null && git add \"$f\"; done; true",
+            "command": "INPUT=$(cat); echo \"$INPUT\" | grep -q '\"git commit' && git diff --cached --name-only --diff-filter=ACM | grep -E \"\\.(ts|json|md|cjs|yml)$\" | while IFS= read -r f; do npx prettier --write \"$f\" 2>/dev/null && git add \"$f\"; done; true",
             "shell": "bash",
             "statusMessage": "Formatting staged files...",
             "timeout": 30
@@ -32,8 +31,7 @@
         "hooks": [
           {
             "type": "command",
-            "if": "Bash(git commit *)",
-            "command": "git push -u origin HEAD 2>&1 || true",
+            "command": "INPUT=$(cat); echo \"$INPUT\" | grep -q '\"git commit' && git push -u origin HEAD 2>&1 || true",
             "shell": "bash",
             "statusMessage": "Pushing to remote...",
             "timeout": 30
