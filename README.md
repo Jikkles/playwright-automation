@@ -13,6 +13,7 @@ An end-to-end test automation framework built with Playwright and TypeScript, de
 | GitHub Actions                        | CI/CD pipeline                                     |
 | HTML Reporter                         | Built-in Playwright test result reporting          |
 | Allure Reporter                       | Rich interactive reporting with history and trends |
+| axe-core / @axe-core/playwright       | Automated WCAG accessibility scanning              |
 
 ## 🏗️ Project Structure
 
@@ -48,6 +49,10 @@ playwright-automation/
 - **Failure artefacts** — Screenshots and video automatically captured on failure, traces on first retry
 - **CI/CD pipeline** — Automated runs on every push and PR via GitHub Actions with browser caching
 - **Allure reporting** — Rich interactive reports with step-level timings, inline attachments, and trend history across CI runs
+- **Accessibility testing** — Automated WCAG 2 AA scans via axe-core on all key pages (login, inventory, cart, checkout)
+- **Network resilience tests** — `page.route()` interception tests verify core functionality survives resource failures
+- **Parameterised test data** — Checkout flow validated across multiple customer profiles covering different name formats and postal code conventions
+- **Dependency automation** — Dependabot raises weekly PRs for npm packages and GitHub Actions pins
 
 ## 🚀 Getting Started
 
@@ -112,6 +117,9 @@ npm run format
 
 # Check formatting without writing
 npm run format:check
+
+# Run TypeScript type checking without emitting files
+npm run typecheck
 ```
 
 ## 🌐 Test Target
@@ -120,10 +128,13 @@ Tests run against [Sauce Demo](https://www.saucedemo.com/), a purpose-built e-co
 
 ## 📋 CI/CD
 
-Tests execute automatically on every push and pull request to `main` via GitHub Actions on `ubuntu-24.04`. The pipeline caches Playwright browsers by a hash of `package-lock.json` and `playwright.config.ts` (so the cache auto-invalidates when the browser list changes), runs the full Chromium, Firefox, and WebKit suite with 4 parallel workers, and uploads both the HTML report and Allure report as build artefacts with a 5-day retention window. Allure history is persisted across runs via the Actions cache, enabling trend charts from the second run onward.
+Tests execute automatically on every push and pull request to `main` via GitHub Actions on `ubuntu-24.04`. The pipeline runs a **quality gate first** (lint, formatting, TypeScript type check, `npm audit`) before tests are allowed to start. If quality passes, the full Chromium, Firefox, and WebKit suite runs with 4 parallel workers. Playwright browsers are cached by a hash of `package-lock.json` and `playwright.config.ts`, so the cache auto-invalidates when the browser list changes. After the run, a minimum test count is asserted to catch accidental spec file deletion. Both the HTML report and Allure report are uploaded as build artefacts with a 5-day retention window. Allure history is persisted across runs via the Actions cache, enabling trend charts from the second run onward.
 
 ## 🗺️ Roadmap
 
 - [x] WebKit (Safari) browser coverage
-- [ ] API test layer for faster setup and teardown
 - [x] Allure reporting integration
+- [x] Accessibility (WCAG) test coverage via axe-core
+- [x] Network resilience tests
+- [x] Automated dependency updates via Dependabot
+- [ ] API test layer for faster setup and teardown

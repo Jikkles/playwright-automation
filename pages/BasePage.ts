@@ -1,4 +1,5 @@
 import { Page, Locator } from '@playwright/test';
+import AxeBuilder from '@axe-core/playwright';
 
 export abstract class BasePage {
   readonly page: Page;
@@ -55,5 +56,15 @@ export abstract class BasePage {
   async getCartBadgeCount(): Promise<number> {
     const text = (await this.cartBadge.textContent()) ?? '0';
     return parseInt(text, 10);
+  }
+
+  async checkAccessibility(): Promise<void> {
+    const results = await new AxeBuilder({ page: this.page }).analyze();
+    if (results.violations.length > 0) {
+      const summary = results.violations
+        .map((v) => `[${v.impact}] ${v.id}: ${v.description}`)
+        .join('\n');
+      throw new Error(`Accessibility violations found:\n${summary}`);
+    }
   }
 }
