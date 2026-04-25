@@ -130,6 +130,20 @@ Tests run against [Sauce Demo](https://www.saucedemo.com/), a purpose-built e-co
 
 Tests execute automatically on every push and pull request to `main` via GitHub Actions on `ubuntu-24.04`. The pipeline runs a **quality gate first** (lint, formatting, TypeScript type check, `npm audit`) before tests are allowed to start. If quality passes, the full Chromium, Firefox, and WebKit suite runs with 4 parallel workers. Playwright browsers are cached by a hash of `package-lock.json` and `playwright.config.ts`, so the cache auto-invalidates when the browser list changes. After the run, a minimum test count is asserted to catch accidental spec file deletion. Both the HTML report and Allure report are uploaded as build artefacts with a 5-day retention window. Allure history is persisted across runs via the Actions cache, enabling trend charts from the second run onward.
 
+## 🔀 Branch workflow
+
+Feature branches should be rebased onto `main` before pushing to keep the history linear and PRs up to date:
+
+```bash
+# Fetch and rebase in one step
+npm run sync
+
+# Then push (force needed after rebase)
+git push --force-with-lease
+```
+
+A pre-push hook in `.githooks/pre-push` enforces this — it blocks the push and prints the above commands if your branch is behind `origin/main`. The hook is activated automatically via `core.hooksPath` in the repo config once you run `git config core.hooksPath .githooks` after cloning.
+
 ## 🗺️ Roadmap
 
 - [x] WebKit (Safari) browser coverage
