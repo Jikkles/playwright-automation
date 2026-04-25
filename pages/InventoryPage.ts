@@ -1,5 +1,6 @@
 import { Page, Locator } from '@playwright/test';
 import { BasePage } from './BasePage';
+import { parseCurrency } from '../data/utils';
 
 export class InventoryPage extends BasePage {
   readonly inventoryContainer: Locator;
@@ -56,7 +57,7 @@ export class InventoryPage extends BasePage {
 
   async getItemPrices(): Promise<number[]> {
     const priceTexts = await this.inventoryItemPrices.allTextContents();
-    return priceTexts.map((p) => parseFloat(p.replace('$', '')));
+    return priceTexts.map((p) => parseCurrency(p));
   }
 
   async getItemDescriptions(): Promise<string[]> {
