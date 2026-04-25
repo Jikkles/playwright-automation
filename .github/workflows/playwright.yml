@@ -13,8 +13,8 @@ jobs:
     env:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
         with:
           node-version: 24
       - name: Install dependencies
@@ -35,14 +35,14 @@ jobs:
     env:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
         with:
           node-version: 24
       - name: Install dependencies
         run: npm ci
       - name: Cache Playwright browsers
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         id: playwright-cache
         with:
           path: ~/.cache/ms-playwright
@@ -54,7 +54,7 @@ jobs:
         if: steps.playwright-cache.outputs.cache-hit == 'true'
         run: npx playwright install-deps chromium firefox webkit
       - name: Restore Allure history
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v5
         with:
           path: allure-results/history
           key: allure-history-${{ github.run_number }}
@@ -75,18 +75,18 @@ jobs:
         if: ${{ !cancelled() }}
         run: npx allure generate allure-results --clean -o allure-report
       - name: Save Allure history
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@v5
         if: ${{ !cancelled() }}
         with:
           path: allure-report/history
           key: allure-history-${{ github.run_number }}
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: ${{ !cancelled() }}
         with:
           name: playwright-report
           path: playwright-report/
           retention-days: 5
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: ${{ !cancelled() }}
         with:
           name: allure-report
