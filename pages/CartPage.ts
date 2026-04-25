@@ -50,5 +50,4 @@ export class CartPage extends BasePage {
   async continueShopping(): Promise<void> {
     await this.continueShoppingButton.click();
   }
-
 }
