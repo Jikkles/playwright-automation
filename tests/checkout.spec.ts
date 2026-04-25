@@ -1,5 +1,5 @@
 import { test, expect } from '../fixtures';
-import { customer } from '../data/checkout';
+import { customer, customers } from '../data/checkout';
 
 test.describe('Checkout', () => {
   test.beforeEach(async ({ page, inventoryPage, cartPage }) => {
@@ -76,4 +76,23 @@ test.describe('Checkout', () => {
       await expect(checkoutPage.pageTitle).toHaveText('Checkout: Overview');
     });
   });
+});
+
+test.describe('Checkout - Customer profile variations', () => {
+  for (const profile of customers) {
+    test(`should advance to step 2 with profile: ${profile.label}`, async ({
+      page,
+      inventoryPage,
+      cartPage,
+      checkoutPage,
+    }) => {
+      await page.goto('/inventory.html');
+      await inventoryPage.addFirstItemToCart();
+      await inventoryPage.goToCart();
+      await cartPage.proceedToCheckout();
+      await checkoutPage.fillCustomerInfo(profile.firstName, profile.lastName, profile.postalCode);
+      await checkoutPage.continue();
+      await expect(page).toHaveURL('/checkout-step-two.html');
+    });
+  }
 });

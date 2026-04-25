@@ -23,6 +23,10 @@ jobs:
         run: npm run lint
       - name: Check formatting
         run: npm run format:check
+      - name: Type check
+        run: npm run typecheck
+      - name: Security audit
+        run: npm audit --audit-level=moderate
 
   test:
     needs: quality
@@ -58,6 +62,15 @@ jobs:
             allure-history-
       - name: Run Playwright tests
         run: npx playwright test
+      - name: Verify minimum test count
+        if: ${{ !cancelled() }}
+        run: |
+          EXPECTED=$(jq '.stats.expected' test-results/results.json)
+          echo "Tests passed: $EXPECTED"
+          if [ "$EXPECTED" -lt 200 ]; then
+            echo "Test count too low: $EXPECTED (minimum: 200). A spec file may have been removed."
+            exit 1
+          fi
       - name: Generate Allure report
         if: ${{ !cancelled() }}
         run: npx allure generate allure-results --clean -o allure-report
