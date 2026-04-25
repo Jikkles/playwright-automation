@@ -1,5 +1,19 @@
 {
   "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "INPUT=$(cat); echo \"$INPUT\" | grep -q '\"git commit' && git diff --cached --name-only --diff-filter=ACM | grep -E \"\\.(ts|json|md|cjs|yml)$\" | while IFS= read -r f; do npx prettier --write \"$f\" 2>/dev/null && git add \"$f\"; done; true",
+            "shell": "bash",
+            "statusMessage": "Formatting staged files...",
+            "timeout": 30
+          }
+        ]
+      }
+    ],
     "PostToolUse": [
       {
         "matcher": "Edit|Write",
@@ -9,6 +23,18 @@
             "prompt": "A file was just edited. The hook payload is: $ARGUMENTS\n\nExtract tool_input.file_path from the payload. If the path contains a 'pages' or 'tests' directory segment, perform a focused code review of that file. Review for: Playwright selector quality and stability, correct async/await usage, Page Object Model pattern adherence, potential test flakiness, and TypeScript best practices. Report findings concisely.\n\nIf the file is NOT inside a pages/ or tests/ directory, do nothing and exit immediately.",
             "statusMessage": "Reviewing changed file...",
             "timeout": 120
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "INPUT=$(cat); echo \"$INPUT\" | grep -q '\"git commit' && git push -u origin HEAD 2>&1 || true",
+            "shell": "bash",
+            "statusMessage": "Pushing to remote...",
+            "timeout": 30
           }
         ]
       }
