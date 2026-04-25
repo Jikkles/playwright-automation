@@ -68,7 +68,7 @@ pages/                     — Page Object Model classes (all extend BasePage ex
 tests/                     — test specifications
 data/credentials.ts        — test user credentials (reads from env vars)
 data/checkout.ts           — customer fixture data
-.env.example               — documents all supported environment variables
+.env                       — environment variable overrides (gitignored)
 ```
 
 ### Config
@@ -80,7 +80,7 @@ data/checkout.ts           — customer fixture data
 
 ## Environment Variables
 
-Copy `.env.example` to `.env` and override values to target a different environment:
+Edit `.env` to override values and target a different environment:
 
 ```
 BASE_URL=https://www.saucedemo.com/
