@@ -28,7 +28,7 @@ playwright-automation/
 ├── data/                   # Externalised test data and credentials
 ├── .github/
 │   └── workflows/          # GitHub Actions CI configuration
-├── .env.example            # Documents all supported environment variables
+├── .env                    # Environment variable overrides (gitignored)
 ├── eslint.config.cjs       # ESLint configuration
 ├── .prettierrc.json        # Prettier configuration
 ├── playwright.config.ts
@@ -44,7 +44,7 @@ playwright-automation/
 - **TypeScript** — Full type safety across page objects, fixtures, and test files with strict mode enabled
 - **ESLint + Prettier** — Enforced code quality and consistent formatting, including Playwright-specific rules
 - **Test tagging** — `@smoke` tags on critical-path tests enable fast targeted runs: `npm run test:smoke`
-- **Environment variables** — Base URL and credentials configurable via `.env`, documented in `.env.example`
+- **Environment variables** — Base URL and credentials configurable via `.env` (gitignored; defaults are built in)
 - **Smart retry logic** — 2 retries in CI, 0 locally for an honest local signal
 - **Failure artefacts** — Screenshots and video automatically captured on failure, traces on first retry
 - **CI/CD pipeline** — Automated runs on every push and PR via GitHub Actions with browser caching
@@ -72,11 +72,7 @@ npx playwright install chromium firefox webkit
 
 ### Environment Variables
 
-Copy `.env.example` to `.env` to override the base URL or credentials for a different environment:
-
-```bash
-cp .env.example .env
-```
+Edit `.env` to override the base URL or credentials for a different environment:
 
 ### Running Tests
 
