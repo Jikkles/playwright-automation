@@ -33,7 +33,7 @@
   "homepage": "https://github.com/Jikkles/playwright-automation#readme",
   "devDependencies": {
     "@axe-core/playwright": "^4.11.2",
-    "@playwright/test": "^1.58.2",
+    "@playwright/test": "^1.59.1",
     "@types/node": "^25.6.0",
     "allure-commandline": "^2.38.1",
     "allure-playwright": "^3.7.1",
