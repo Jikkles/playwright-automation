@@ -1,5 +1,6 @@
 import { Page, Locator } from '@playwright/test';
 import { BasePage } from './BasePage';
+import { parseCurrency } from '../data/utils';
 
 export class CartPage extends BasePage {
   readonly cartItems: Locator;
@@ -31,7 +32,7 @@ export class CartPage extends BasePage {
 
   async getCartItemPrices(): Promise<number[]> {
     const priceTexts = await this.cartItemPrices.allTextContents();
-    return priceTexts.map((p) => parseFloat(p.replace('$', '')));
+    return priceTexts.map((p) => parseCurrency(p));
   }
 
   async getCartItemQuantities(): Promise<string[]> {
@@ -50,10 +51,4 @@ export class CartPage extends BasePage {
     await this.continueShoppingButton.click();
   }
 
-  async clearCart(): Promise<void> {
-    const count = await this.removeButtons.count();
-    for (let i = 0; i < count; i++) {
-      await this.removeButtons.first().click();
-    }
-  }
 }

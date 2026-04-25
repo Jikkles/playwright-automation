@@ -21,8 +21,4 @@ export const credentials = {
     username: process.env.ERROR_USER ?? 'error_user',
     password,
   },
-  visualUser: {
-    username: process.env.VISUAL_USER ?? 'visual_user',
-    password,
-  },
 };

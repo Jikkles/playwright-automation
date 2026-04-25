@@ -68,6 +68,7 @@ pages/                     — Page Object Model classes (all extend BasePage ex
 tests/                     — test specifications
 data/credentials.ts        — test user credentials (reads from env vars)
 data/checkout.ts           — customer fixture data
+data/utils.ts              — shared test data utilities (e.g. parseCurrency)
 .env                       — environment variable overrides (gitignored)
 ```
 
@@ -97,7 +98,6 @@ STANDARD_USER=standard_user
 | `problem_user`            | Degraded UX — sort broken, last name field silently drops input    |
 | `performance_glitch_user` | Artificial ~5s login delay                                         |
 | `error_user`              | Some interactions produce errors — covered in `error-user.spec.ts` |
-| `visual_user`             | Visual layout differences                                          |
 
 ## Test Tagging
 
