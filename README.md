@@ -67,7 +67,7 @@ playwright-automation/
 git clone https://github.com/Jikkles/playwright-automation.git
 cd playwright-automation
 npm install
-npx playwright install chromium firefox
+npx playwright install chromium firefox webkit
 ```
 
 ### Environment Variables
@@ -81,7 +81,7 @@ cp .env.example .env
 ### Running Tests
 
 ```bash
-# Run the full suite (Chromium + Firefox)
+# Run the full suite (Chromium, Firefox, and WebKit)
 npm test
 
 # Run critical-path smoke tests only

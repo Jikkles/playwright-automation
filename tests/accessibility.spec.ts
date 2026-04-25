@@ -1,5 +1,6 @@
 import { test, expect } from '../fixtures';
 import AxeBuilder from '@axe-core/playwright';
+import { customer } from '../data/checkout';
 
 // SauceDemo has known structural WCAG violations on every page:
 //   [moderate] landmark-one-main  — no <main> landmark element
@@ -83,7 +84,7 @@ test.describe('Accessibility - Authenticated pages', () => {
     await inventoryPage.addFirstItemToCart();
     await inventoryPage.goToCart();
     await cartPage.proceedToCheckout();
-    await checkoutPage.fillCustomerInfo('John', 'Smith', 'SW1A 1AA');
+    await checkoutPage.fillCustomerInfo(customer.firstName, customer.lastName, customer.postalCode);
     await checkoutPage.continue();
     await expect(page).toHaveURL('/checkout-step-two.html');
     await checkoutPage.checkAccessibility();
