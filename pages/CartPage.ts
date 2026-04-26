@@ -27,7 +27,7 @@ export class CartPage extends BasePage {
   }
 
   async getCartItemNames(): Promise<string[]> {
-    return this.cartItemNames.allTextContents();
+    return (await this.cartItemNames.allTextContents()).map((s) => s.trim());
   }
 
   async getCartItemPrices(): Promise<number[]> {
@@ -36,7 +36,7 @@ export class CartPage extends BasePage {
   }
 
   async getCartItemQuantities(): Promise<string[]> {
-    return this.cartItemQuantities.allTextContents();
+    return (await this.cartItemQuantities.allTextContents()).map((s) => s.trim());
   }
 
   async removeFirstItem(): Promise<void> {
