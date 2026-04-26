@@ -2,15 +2,17 @@ import { Page, Locator } from '@playwright/test';
 import { BasePage } from './BasePage';
 import { parseCurrency } from '../data/utils';
 
+const ADD_TO_CART_SELECTOR = 'button[data-test*="add-to-cart"]';
+
 export class InventoryPage extends BasePage {
-  readonly inventoryContainer: Locator;
-  readonly inventoryItems: Locator;
-  readonly inventoryItemNames: Locator;
-  readonly inventoryItemPrices: Locator;
-  readonly inventoryItemDescriptions: Locator;
-  readonly addToCartButtons: Locator;
-  readonly removeFromCartButtons: Locator;
-  readonly sortDropdown: Locator;
+  public readonly inventoryContainer: Locator;
+  public readonly inventoryItems: Locator;
+  private readonly inventoryItemNames: Locator;
+  private readonly inventoryItemPrices: Locator;
+  private readonly inventoryItemDescriptions: Locator;
+  public readonly addToCartButtons: Locator;
+  public readonly removeFromCartButtons: Locator;
+  private readonly sortDropdown: Locator;
 
   constructor(page: Page) {
     super(page);
@@ -19,7 +21,7 @@ export class InventoryPage extends BasePage {
     this.inventoryItemNames = page.locator('[data-test="inventory-item-name"]');
     this.inventoryItemPrices = page.locator('[data-test="inventory-item-price"]');
     this.inventoryItemDescriptions = page.locator('[data-test="inventory-item-desc"]');
-    this.addToCartButtons = page.locator('button[data-test*="add-to-cart"]');
+    this.addToCartButtons = page.locator(ADD_TO_CART_SELECTOR);
     this.removeFromCartButtons = page.locator('button[data-test*="remove"]');
     this.sortDropdown = page.locator('[data-test="product-sort-container"]');
   }
@@ -33,14 +35,15 @@ export class InventoryPage extends BasePage {
   }
 
   async addItemsToCart(count: number): Promise<void> {
+    // Always clicks nth(0): each click removes that button from the DOM, shrinking the list
     for (let i = 0; i < count; i++) {
-      await this.addToCartButtons.nth(i).click();
+      await this.addToCartButtons.nth(0).click();
     }
   }
 
   async addItemToCartByName(name: string): Promise<void> {
     const item = this.inventoryItems.filter({ hasText: name });
-    await item.locator('button[data-test*="add-to-cart"]').click();
+    await item.locator(ADD_TO_CART_SELECTOR).click();
   }
 
   async removeFirstItemFromCart(): Promise<void> {
@@ -52,7 +55,7 @@ export class InventoryPage extends BasePage {
   }
 
   async getItemNames(): Promise<string[]> {
-    return this.inventoryItemNames.allTextContents();
+    return (await this.inventoryItemNames.allTextContents()).map((s) => s.trim());
   }
 
   async getItemPrices(): Promise<number[]> {
