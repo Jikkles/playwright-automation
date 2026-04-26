@@ -159,6 +159,4 @@ test.describe('Inventory Page', () => {
     const cartNames = await cartPage.getCartItemNames();
     expect(cartNames).toContain(KNOWN_CART_ITEM);
   });
-
 });
-

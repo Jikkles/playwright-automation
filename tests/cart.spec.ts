@@ -94,26 +94,27 @@ test.describe('Cart', () => {
     await expect(inventoryPage.cartBadge).toHaveText('1');
   });
 
-  test('should navigate to cart page via cart icon', { tag: '@smoke' }, async ({
-    page,
-    inventoryPage,
-    cartPage,
-  }) => {
-    await inventoryPage.goToCart();
-    await expect(page).toHaveURL(/\/cart\.html$/);
-    await expect(cartPage.pageTitle).toHaveText('Your Cart');
-  });
+  test(
+    'should navigate to cart page via cart icon',
+    { tag: '@smoke' },
+    async ({ page, inventoryPage, cartPage }) => {
+      await inventoryPage.goToCart();
+      await expect(page).toHaveURL(/\/cart\.html$/);
+      await expect(cartPage.pageTitle).toHaveText('Your Cart');
+    }
+  );
 
-  test('should remove item from cart page', { tag: '@smoke' }, async ({
-    inventoryPage,
-    cartPage,
-  }) => {
-    await inventoryPage.addFirstItemToCart();
-    await inventoryPage.goToCart();
-    await expect(cartPage.cartItems).toHaveCount(1); // precondition: confirm item is in cart
-    await cartPage.removeFirstItem();
-    await expect(cartPage.cartItems).toHaveCount(0);
-  });
+  test(
+    'should remove item from cart page',
+    { tag: '@smoke' },
+    async ({ inventoryPage, cartPage }) => {
+      await inventoryPage.addFirstItemToCart();
+      await inventoryPage.goToCart();
+      await expect(cartPage.cartItems).toHaveCount(1); // precondition: confirm item is in cart
+      await cartPage.removeFirstItem();
+      await expect(cartPage.cartItems).toHaveCount(0);
+    }
+  );
 
   test('should hide cart badge after removing last item from cart page', async ({
     inventoryPage,

@@ -113,11 +113,14 @@ test('should login with valid credentials', { tag: '@smoke' }, async ({ ... }) =
 ## Automatic Code Review
 
 ### When the user asks to review code
+
 When the user asks to review recent code, check code quality, or similar, announce in chat first:
+
 > "🔍 Running code-reviewer on `<filename>`..."
-Then invoke the `code-reviewer` agent on the relevant file(s) and display the full output.
+> Then invoke the `code-reviewer` agent on the relevant file(s) and display the full output.
 
 ### After editing a file in `tests/` — Test File Workflow
+
 Run this loop automatically after every `Edit` or `Write` to any file in `tests/`. Do not ask for confirmation.
 
 1. Announce in chat: "🔍 Running code-reviewer on `<filename>`..."
@@ -133,6 +136,7 @@ Run this loop automatically after every `Edit` or `Write` to any file in `tests/
 9. Output the end-of-session summary (see below).
 
 ### After editing a file in `pages/` — Page File Workflow
+
 Run this loop automatically after every `Edit` or `Write` to any file in `pages/`. Do not ask for confirmation.
 
 1. Announce in chat: "🔍 Running code-reviewer on `<filename>`..."
@@ -144,6 +148,7 @@ Run this loop automatically after every `Edit` or `Write` to any file in `pages/
 7. Output the end-of-session summary (see below).
 
 ### End-of-session summary
+
 When the loop completes, output a clearly labelled summary:
 
 **✅ Code Review Complete — `<filename>`**

@@ -13,6 +13,7 @@ You are a senior test automation engineer with deep expertise in Playwright, Typ
 ## Starting every review
 
 Before any analysis, output this line so the user knows the review is running:
+
 > 🔍 **Code review in progress** — `<filename>`
 
 ## Scope
@@ -81,11 +82,11 @@ For each file reviewed:
 
 **`path/to/file.ts`**
 
-| Severity | Line | Issue | Recommendation |
-| -------- | ---- | ----- | -------------- |
-| 🔴 Blocking | 42 | `page.waitForTimeout(2000)` — hardcoded wait causes flakiness | Replace with auto-waiting |
-| 🟡 Warning | 18 | Locator declared inline in method | Move to a `readonly` class property |
-| 🟢 Suggestion | 7 | Import order inconsistent | Group external then internal imports |
+| Severity      | Line | Issue                                                         | Recommendation                       |
+| ------------- | ---- | ------------------------------------------------------------- | ------------------------------------ |
+| 🔴 Blocking   | 42   | `page.waitForTimeout(2000)` — hardcoded wait causes flakiness | Replace with auto-waiting            |
+| 🟡 Warning    | 18   | Locator declared inline in method                             | Move to a `readonly` class property  |
+| 🟢 Suggestion | 7    | Import order inconsistent                                     | Group external then internal imports |
 
 Severity levels:
 
@@ -97,10 +98,10 @@ Severity levels:
 
 If any locators or methods have no usages in `tests/`, list them here:
 
-| Type | Name | Line | Action |
-| ---- | ---- | ---- | ------ |
-| Locator | `cartBadge` | 12 | Remove or add a test that uses it |
-| Method | `resetAppState` | 45 | Remove or add a test that calls it |
+| Type    | Name            | Line | Action                             |
+| ------- | --------------- | ---- | ---------------------------------- |
+| Locator | `cartBadge`     | 12   | Remove or add a test that uses it  |
+| Method  | `resetAppState` | 45   | Remove or add a test that calls it |
 
 Omit this section entirely if everything is used.
 
