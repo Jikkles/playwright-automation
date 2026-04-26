@@ -85,7 +85,7 @@ test.describe('Accessibility - Authenticated pages', () => {
     await inventoryPage.goToCart();
     await cartPage.proceedToCheckout();
     await checkoutPage.fillCustomerInfo(customer.firstName, customer.lastName, customer.postalCode);
-    await checkoutPage.continue();
+    await checkoutPage.submitCustomerInfo();
     await expect(page).toHaveURL('/checkout-step-two.html');
     await checkoutPage.checkAccessibility();
   });

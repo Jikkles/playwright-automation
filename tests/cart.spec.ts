@@ -78,7 +78,7 @@ test.describe('Cart', () => {
     await inventoryPage.goToCart();
 
     const quantities = await cartPage.getCartItemQuantities();
-    expect(quantities).toEqual(['1', '1']);
+    expect(quantities).toEqual([1, 1]);
   });
 
   test('should persist cart contents after navigating back from cart', async ({
@@ -126,5 +126,21 @@ test.describe('Cart', () => {
     // assert cart is empty first so the badge absence check does not race against item removal
     await expect(cartPage.cartItems).toHaveCount(0);
     await expect(cartPage.cartBadge).toBeHidden();
+  });
+
+  test('should remove a specific item by name from the cart', async ({
+    inventoryPage,
+    cartPage,
+  }) => {
+    const itemNames = await inventoryPage.getItemNames();
+    await inventoryPage.addItemToCartByName(itemNames[0]);
+    await inventoryPage.addItemToCartByName(itemNames[1]);
+    await inventoryPage.goToCart();
+    await expect(cartPage.cartItems).toHaveCount(2);
+    await cartPage.removeItemByName(itemNames[0]);
+    await expect(cartPage.cartItems).toHaveCount(1);
+    const remaining = await cartPage.getCartItemNames();
+    expect(remaining).not.toContain(itemNames[0]);
+    expect(remaining).toContain(itemNames[1]);
   });
 });

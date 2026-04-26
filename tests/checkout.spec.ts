@@ -13,19 +13,19 @@ test.describe('Checkout', () => {
   test.describe('Step 1 - Customer Information', () => {
     test('should show error when first name is missing', async ({ checkoutPage }) => {
       await checkoutPage.fillCustomerInfo('', customer.lastName, customer.postalCode);
-      await checkoutPage.continue();
+      await checkoutPage.submitCustomerInfo();
       await expect(checkoutPage.errorMessage).toContainText('First Name is required');
     });
 
     test('should show error when last name is missing', async ({ checkoutPage }) => {
       await checkoutPage.fillCustomerInfo(customer.firstName, '', customer.postalCode);
-      await checkoutPage.continue();
+      await checkoutPage.submitCustomerInfo();
       await expect(checkoutPage.errorMessage).toContainText('Last Name is required');
     });
 
     test('should show error when postal code is missing', async ({ checkoutPage }) => {
       await checkoutPage.fillCustomerInfo(customer.firstName, customer.lastName, '');
-      await checkoutPage.continue();
+      await checkoutPage.submitCustomerInfo();
       await expect(checkoutPage.errorMessage).toContainText('Postal Code is required');
     });
 
@@ -38,7 +38,7 @@ test.describe('Checkout', () => {
           customer.lastName,
           customer.postalCode
         );
-        await checkoutPage.continue();
+        await checkoutPage.submitCustomerInfo();
         await expect(page).toHaveURL('/checkout-step-two.html');
       }
     );
@@ -56,7 +56,7 @@ test.describe('Checkout', () => {
         customer.lastName,
         customer.postalCode
       );
-      await checkoutPage.continue();
+      await checkoutPage.submitCustomerInfo();
       await expect(page).toHaveURL('/checkout-step-two.html');
     });
 
@@ -91,7 +91,7 @@ test.describe('Checkout - Customer profile variations', () => {
       await inventoryPage.goToCart();
       await cartPage.proceedToCheckout();
       await checkoutPage.fillCustomerInfo(profile.firstName, profile.lastName, profile.postalCode);
-      await checkoutPage.continue();
+      await checkoutPage.submitCustomerInfo();
       await expect(page).toHaveURL('/checkout-step-two.html');
     });
   }

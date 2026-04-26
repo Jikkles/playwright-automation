@@ -1,25 +1,26 @@
 import { Page, Locator } from '@playwright/test';
 import { BasePage } from './BasePage';
+import { parseCurrency } from '../data/utils';
 
 export class CheckoutPage extends BasePage {
   // Step 1 — Your Information
-  readonly firstNameInput: Locator;
-  readonly lastNameInput: Locator;
-  readonly postalCodeInput: Locator;
-  readonly continueButton: Locator;
-  readonly cancelButton: Locator;
-  readonly errorMessage: Locator;
+  private readonly firstNameInput: Locator;
+  private readonly lastNameInput: Locator;
+  private readonly postalCodeInput: Locator;
+  private readonly continueButton: Locator;
+  private readonly cancelButton: Locator;
+  public readonly errorMessage: Locator;
 
   // Step 2 — Overview
-  readonly overviewItemNames: Locator;
-  readonly subtotalLabel: Locator;
-  readonly taxLabel: Locator;
-  readonly totalLabel: Locator;
-  readonly finishButton: Locator;
+  private readonly overviewItemNames: Locator;
+  private readonly subtotalLabel: Locator;
+  private readonly taxLabel: Locator;
+  private readonly totalLabel: Locator;
+  private readonly finishButton: Locator;
 
   // Complete
-  readonly confirmationHeader: Locator;
-  readonly backToProductsButton: Locator;
+  public readonly confirmationHeader: Locator;
+  private readonly backToProductsButton: Locator;
 
   constructor(page: Page) {
     super(page);
@@ -41,13 +42,15 @@ export class CheckoutPage extends BasePage {
     this.backToProductsButton = page.locator('[data-test="back-to-products"]');
   }
 
+  /** Fills customer info fields. Does not submit — call submitCustomerInfo() separately. */
   async fillCustomerInfo(firstName: string, lastName: string, postalCode: string): Promise<void> {
     await this.firstNameInput.fill(firstName);
     await this.lastNameInput.fill(lastName);
     await this.postalCodeInput.fill(postalCode);
   }
 
-  async continue(): Promise<void> {
+  /** Submits the customer information form filled by fillCustomerInfo(). */
+  async submitCustomerInfo(): Promise<void> {
     await this.continueButton.click();
   }
 
@@ -67,21 +70,15 @@ export class CheckoutPage extends BasePage {
     return this.overviewItemNames.allTextContents();
   }
 
-  private async parseCurrencyLabel(locator: Locator): Promise<number> {
-    const text = (await locator.textContent()) ?? '';
-    const match = text.match(/\$(\d+\.\d{2})/);
-    return match ? parseFloat(match[1]) : NaN;
-  }
-
   async getSubtotal(): Promise<number> {
-    return this.parseCurrencyLabel(this.subtotalLabel);
+    return parseCurrency((await this.subtotalLabel.textContent()) ?? '');
   }
 
   async getTax(): Promise<number> {
-    return this.parseCurrencyLabel(this.taxLabel);
+    return parseCurrency((await this.taxLabel.textContent()) ?? '');
   }
 
   async getTotal(): Promise<number> {
-    return this.parseCurrencyLabel(this.totalLabel);
+    return parseCurrency((await this.totalLabel.textContent()) ?? '');
   }
 }

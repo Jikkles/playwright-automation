@@ -55,7 +55,7 @@ test.describe('Problem User - Degraded UX', () => {
     await cartPage.proceedToCheckout();
 
     await checkoutPage.fillCustomerInfo(customer.firstName, customer.lastName, customer.postalCode);
-    await checkoutPage.continue();
+    await checkoutPage.submitCustomerInfo();
     await expect(page).toHaveURL('/checkout-step-two.html');
   });
 });

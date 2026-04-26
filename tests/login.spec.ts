@@ -13,9 +13,9 @@ test.describe('Login Page', () => {
     await expect(page).toHaveURL('/');
     await expect(loginPage.loginLogo).toBeVisible();
     await expect(loginPage.loginContainer).toBeVisible();
-    await expect(loginPage.usernameInput).toBeVisible();
-    await expect(loginPage.passwordInput).toBeVisible();
-    await expect(loginPage.loginButton).toBeVisible();
+    await expect(loginPage.getUsernameInput()).toBeVisible();
+    await expect(loginPage.getPasswordInput()).toBeVisible();
+    await expect(loginPage.getLoginButton()).toBeVisible();
   });
 
   test(

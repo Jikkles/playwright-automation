@@ -2,17 +2,20 @@ import { Page, Locator } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 
 export abstract class BasePage {
-  readonly page: Page;
-  // Burger menu uses stable element IDs; no data-test attributes exist on these elements
-  readonly burgerMenuButton: Locator;
-  readonly burgerMenuClose: Locator;
-  readonly burgerMenuAllItems: Locator;
-  readonly burgerMenuLogout: Locator;
-  readonly burgerMenuReset: Locator;
-  // Cart chrome and page title are present on every authenticated page
-  readonly cartIcon: Locator;
-  readonly cartBadge: Locator;
-  readonly pageTitle: Locator;
+  protected readonly page: Page;
+  // Burger menu uses stable element IDs; no data-test attributes exist on these elements.
+  // openBurgerMenu/closeBurgerMenu remain public so navigation tests can exercise them directly.
+  // burgerMenuClose is internal-only; all other burger locators are public for visibility assertions.
+  public readonly burgerMenuButton: Locator;
+  protected readonly burgerMenuClose: Locator;
+  public readonly burgerMenuAllItems: Locator;
+  public readonly burgerMenuLogout: Locator;
+  public readonly burgerMenuReset: Locator;
+  // cartBadge and pageTitle remain public so tests can use Playwright's auto-retrying locator assertions
+  // (e.g. toHaveText, toBeHidden) — getCartBadgeCount() returns a number and cannot replace these.
+  public readonly cartIcon: Locator;
+  public readonly cartBadge: Locator;
+  public readonly pageTitle: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -54,9 +57,12 @@ export abstract class BasePage {
   }
 
   async getCartBadgeCount(): Promise<number> {
+    // badge element is absent when cart is empty
     if (!(await this.cartBadge.isVisible())) return 0;
     const text = (await this.cartBadge.textContent()) ?? '0';
-    return parseInt(text, 10);
+    const count = parseInt(text, 10);
+    if (isNaN(count)) throw new Error(`Could not parse cart badge count from: "${text}"`);
+    return count;
   }
 
   async checkAccessibility(): Promise<void> {

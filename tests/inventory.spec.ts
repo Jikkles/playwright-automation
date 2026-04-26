@@ -35,7 +35,7 @@ test.describe('Inventory Page', () => {
   });
 
   test('should add multiple items to cart', async ({ inventoryPage }) => {
-    await inventoryPage.addItemsToCart(3);
+    await inventoryPage.addFirstNItemsToCart(3);
     expect(await inventoryPage.getCartBadgeCount()).toBe(3);
   });
 
@@ -95,7 +95,7 @@ test.describe('Inventory Page', () => {
   });
 
   test('should add all 6 items to cart', async ({ inventoryPage }) => {
-    await inventoryPage.addItemsToCart(EXPECTED_ITEM_COUNT);
+    await inventoryPage.addFirstNItemsToCart(EXPECTED_ITEM_COUNT);
     expect(await inventoryPage.getCartBadgeCount()).toBe(EXPECTED_ITEM_COUNT);
   });
 
@@ -107,7 +107,7 @@ test.describe('Inventory Page', () => {
   });
 
   test('should hide cart badge after removing all added items', async ({ inventoryPage }) => {
-    await inventoryPage.addItemsToCart(3);
+    await inventoryPage.addFirstNItemsToCart(3);
     expect(await inventoryPage.getCartBadgeCount()).toBe(3);
     await inventoryPage.removeFirstItemFromCart();
     expect(await inventoryPage.getCartBadgeCount()).toBe(2);

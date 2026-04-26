@@ -3,14 +3,20 @@ import { BasePage } from './BasePage';
 import { parseCurrency } from '../data/utils';
 
 export class ProductDetailPage extends BasePage {
-  readonly container: Locator;
-  readonly itemName: Locator;
-  readonly itemDescription: Locator;
-  readonly itemPrice: Locator;
-  readonly itemImage: Locator;
-  readonly addToCartButton: Locator;
-  readonly removeButton: Locator;
-  readonly backButton: Locator;
+  // kept public to allow Playwright toBeVisible assertions in tests
+  public readonly container: Locator;
+  private readonly itemName: Locator;
+  private readonly itemDescription: Locator;
+  private readonly itemPrice: Locator;
+  // kept public to allow Playwright toBeVisible assertions in tests
+  public readonly itemImage: Locator;
+  // kept public to allow Playwright toBeVisible/toBeHidden assertions in tests;
+  // attribute value includes the item slug (e.g. add-to-cart-sauce-labs-backpack), so prefix match is required.
+  public readonly addToCartButton: Locator;
+  // kept public to allow Playwright toBeVisible assertions in tests;
+  // attribute value includes the item slug with a dash separator (e.g. remove-sauce-labs-backpack).
+  public readonly removeButton: Locator;
+  private readonly backButton: Locator;
 
   constructor(page: Page) {
     super(page);
@@ -22,7 +28,7 @@ export class ProductDetailPage extends BasePage {
     this.itemPrice = page.locator('.inventory_details_price');
     this.itemImage = page.locator('.inventory_details_img');
     this.addToCartButton = page.locator('[data-test^="add-to-cart"]');
-    this.removeButton = page.locator('[data-test^="remove"]');
+    this.removeButton = page.locator('[data-test^="remove-"]');
     this.backButton = page.locator('[data-test="back-to-products"]');
   }
 
@@ -39,7 +45,9 @@ export class ProductDetailPage extends BasePage {
   }
 
   async getItemName(): Promise<string> {
-    return (await this.itemName.textContent()) ?? '';
+    const text = await this.itemName.textContent();
+    if (text === null) throw new Error('Item name element returned null textContent');
+    return text.trim();
   }
 
   async getItemPrice(): Promise<number> {
@@ -48,6 +56,6 @@ export class ProductDetailPage extends BasePage {
   }
 
   async getItemDescription(): Promise<string> {
-    return (await this.itemDescription.textContent()) ?? '';
+    return ((await this.itemDescription.textContent()) ?? '').trim();
   }
 }
