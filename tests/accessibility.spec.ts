@@ -1,6 +1,7 @@
 import { test, expect } from '../fixtures';
 import AxeBuilder from '@axe-core/playwright';
 import { customer } from '../data/checkout';
+import { checkAccessibility } from '../data/accessibility';
 
 // SauceDemo has known structural WCAG violations on every page:
 //   [moderate] landmark-one-main  — no <main> landmark element
@@ -25,23 +26,16 @@ test.describe('Accessibility - Login page', () => {
 });
 
 test.describe('Accessibility - Authenticated pages', () => {
-  test('inventory page should have no accessibility violations', async ({
-    page,
-    inventoryPage,
-  }) => {
+  test('inventory page should have no accessibility violations', async ({ page }) => {
     test.fixme(
       true,
       'SauceDemo upstream: missing landmarks, no <h1>, unlabelled sort dropdown (select-name critical)'
     );
     await page.goto('/inventory.html');
-    await inventoryPage.checkAccessibility();
+    await checkAccessibility(page);
   });
 
-  test('cart page should have no accessibility violations', async ({
-    page,
-    inventoryPage,
-    cartPage,
-  }) => {
+  test('cart page should have no accessibility violations', async ({ page, inventoryPage }) => {
     test.fixme(
       true,
       'SauceDemo upstream: missing <main> landmark, no <h1> heading, content outside landmark regions'
@@ -49,14 +43,13 @@ test.describe('Accessibility - Authenticated pages', () => {
     await page.goto('/inventory.html');
     await inventoryPage.addFirstItemToCart();
     await inventoryPage.goToCart();
-    await cartPage.checkAccessibility();
+    await checkAccessibility(page);
   });
 
   test('checkout step 1 should have no accessibility violations', async ({
     page,
     inventoryPage,
     cartPage,
-    checkoutPage,
   }) => {
     test.fixme(
       true,
@@ -67,7 +60,7 @@ test.describe('Accessibility - Authenticated pages', () => {
     await inventoryPage.goToCart();
     await cartPage.proceedToCheckout();
     await expect(page).toHaveURL('/checkout-step-one.html');
-    await checkoutPage.checkAccessibility();
+    await checkAccessibility(page);
   });
 
   test('checkout step 2 should have no accessibility violations', async ({
@@ -87,6 +80,6 @@ test.describe('Accessibility - Authenticated pages', () => {
     await checkoutPage.fillCustomerInfo(customer.firstName, customer.lastName, customer.postalCode);
     await checkoutPage.submitCustomerInfo();
     await expect(page).toHaveURL('/checkout-step-two.html');
-    await checkoutPage.checkAccessibility();
+    await checkAccessibility(page);
   });
 });

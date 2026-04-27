@@ -13,10 +13,12 @@ test.describe('Product Detail Page', () => {
     await expect(inventoryPage.inventoryItems).not.toHaveCount(0);
     [firstName] = await inventoryPage.getItemNames();
     [firstPrice] = await inventoryPage.getItemPrices();
+
     await test.step('validate scraped inventory data', async () => {
       expect(firstName, { message: 'getItemNames() returned empty array' }).toBeTruthy();
       expect(firstPrice, { message: 'getItemPrices() returned empty or zero' }).toBeGreaterThan(0);
     });
+
     await inventoryPage.clickItemByName(firstName);
     // wait for detail page navigation to settle before tests begin
     await expect(page).toHaveURL(/\/inventory-item\.html\?id=\d+/);
