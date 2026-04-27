@@ -36,7 +36,6 @@ test.describe('Network resilience', () => {
       await route.continue();
     });
     await page.goto('/inventory.html');
-    await page.waitForLoadState('networkidle');
     const names = await inventoryPage.getItemNames();
     expect(names).toHaveLength(EXPECTED_ITEM_COUNT);
     expect(imageRequestCount).toBeGreaterThan(0);

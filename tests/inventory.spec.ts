@@ -108,14 +108,17 @@ test.describe('Inventory Page', () => {
 
   test('should hide cart badge after removing all added items', async ({ inventoryPage }) => {
     await inventoryPage.addFirstNItemsToCart(3);
+
     await test.step('remove first item — badge shows 2', async () => {
       await inventoryPage.removeFirstItemFromCart();
       expect(await inventoryPage.getCartBadgeCount()).toBe(2);
     });
+
     await test.step('remove second item — badge shows 1', async () => {
       await inventoryPage.removeFirstItemFromCart();
       expect(await inventoryPage.getCartBadgeCount()).toBe(1);
     });
+
     await test.step('remove third item — badge disappears', async () => {
       await inventoryPage.removeFirstItemFromCart();
       await expect(inventoryPage.cartBadge).toBeHidden();

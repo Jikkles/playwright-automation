@@ -39,7 +39,9 @@ test.describe('Cart', () => {
 
   test('added items should appear in cart', async ({ inventoryPage, cartPage }) => {
     const itemNames = await inventoryPage.getItemNames();
-    test.skip(itemNames.length < 2, 'inventory must have at least 2 items');
+    expect(itemNames.length, {
+      message: 'inventory must have at least 2 items',
+    }).toBeGreaterThanOrEqual(2);
     await inventoryPage.addItemToCartByName(itemNames[0]);
     await inventoryPage.addItemToCartByName(itemNames[1]);
     await inventoryPage.goToCart();
@@ -72,7 +74,9 @@ test.describe('Cart', () => {
     cartPage,
   }) => {
     const itemNames = await inventoryPage.getItemNames();
-    test.skip(itemNames.length < 2, 'inventory must have at least 2 items');
+    expect(itemNames.length, {
+      message: 'inventory must have at least 2 items',
+    }).toBeGreaterThanOrEqual(2);
     await inventoryPage.addItemToCartByName(itemNames[0]);
     await inventoryPage.addItemToCartByName(itemNames[1]);
     await inventoryPage.goToCart();
@@ -113,6 +117,7 @@ test.describe('Cart', () => {
         await inventoryPage.goToCart();
         await expect(cartPage.cartItems).toHaveCount(1);
       });
+
       await cartPage.removeFirstItem();
       await expect(cartPage.cartItems).toHaveCount(0);
     }
