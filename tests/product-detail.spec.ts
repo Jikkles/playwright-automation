@@ -101,12 +101,14 @@ test.describe('Product Detail Page', () => {
     async ({ productDetailPage }) => {
       await productDetailPage.addToCart();
       // both assertions together confirm the mutually exclusive button-state toggle
-      await expect(productDetailPage.removeButton).toBeVisible({
-        message: 'Remove button should be visible after item is added',
-      });
-      await expect(productDetailPage.addToCartButton).toBeHidden({
-        message: 'Add to Cart button should be hidden after item is added',
-      });
+      await expect(
+        productDetailPage.removeButton,
+        'Remove button should be visible after item is added'
+      ).toBeVisible();
+      await expect(
+        productDetailPage.addToCartButton,
+        'Add to Cart button should be hidden after item is added'
+      ).toBeHidden();
     }
   );
 
@@ -118,15 +120,18 @@ test.describe('Product Detail Page', () => {
       await productDetailPage.addToCart();
       await productDetailPage.removeFromCart();
       // three assertions confirm the full reset: empty cart, Add to Cart restored, Remove hidden
-      await expect(productDetailPage.cartBadge).toBeHidden({
-        message: 'Cart badge should be absent after removing the item',
-      });
-      await expect(productDetailPage.addToCartButton).toBeVisible({
-        message: 'Add to Cart button should be visible after removing the item',
-      });
-      await expect(productDetailPage.removeButton).toBeHidden({
-        message: 'Remove button should be hidden after item is removed',
-      });
+      await expect(
+        productDetailPage.cartBadge,
+        'Cart badge should be absent after removing the item'
+      ).toBeHidden();
+      await expect(
+        productDetailPage.addToCartButton,
+        'Add to Cart button should be visible after removing the item'
+      ).toBeVisible();
+      await expect(
+        productDetailPage.removeButton,
+        'Remove button should be hidden after item is removed'
+      ).toBeHidden();
     }
   );
 
@@ -146,9 +151,10 @@ test.describe('Product Detail Page', () => {
     { tag: '@smoke' },
     async ({ inventoryPage, productDetailPage }) => {
       // self-contained: addToCart() called here so this test does not depend on prior test state
-      await expect(productDetailPage.cartBadge).toBeHidden({
-        message: 'Cart badge should be absent before adding to cart',
-      }); // assert clean precondition
+      await expect(
+        productDetailPage.cartBadge,
+        'Cart badge should be absent before adding to cart'
+      ).toBeHidden(); // assert clean precondition
       await productDetailPage.addToCart();
       await expect(productDetailPage.cartBadge).toHaveText('1'); // confirm badge set on detail page before navigating
       await productDetailPage.goBack();
