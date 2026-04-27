@@ -28,7 +28,7 @@ test.describe('Product Detail Page', () => {
     async ({ productDetailPage }) => {
       // URL already verified by beforeEach; this confirms the page rendered its primary content
       await expect(productDetailPage.itemImage).toBeVisible();
-    },
+    }
   );
 
   test(
@@ -37,8 +37,10 @@ test.describe('Product Detail Page', () => {
     async ({ productDetailPage }) => {
       // compared against firstName captured from inventory listing in beforeEach
       const name = await productDetailPage.getItemName();
-      expect(name, { message: 'Item name on detail page did not match inventory listing' }).toBe(firstName);
-    },
+      expect(name, { message: 'Item name on detail page did not match inventory listing' }).toBe(
+        firstName
+      );
+    }
   );
 
   test(
@@ -47,21 +49,35 @@ test.describe('Product Detail Page', () => {
     async ({ productDetailPage }) => {
       // compared against firstPrice captured from inventory listing in beforeEach
       const price = await productDetailPage.getItemPrice();
-      expect(price, { message: 'Item price on detail page did not match inventory listing' }).toBe(firstPrice);
-    },
+      expect(price, { message: 'Item price on detail page did not match inventory listing' }).toBe(
+        firstPrice
+      );
+    }
   );
 
-  test('should display a non-empty description', { tag: '@smoke' }, async ({ productDetailPage }) => {
-    const description = await productDetailPage.getItemDescription();
-    // > 10 chars after trimming is a pragmatic minimum; the shortest SauceDemo description is ~30 chars
-    expect(description.trim().length, { message: `Description was: "${description}"` }).toBeGreaterThanOrEqual(10);
-  });
+  test(
+    'should display a non-empty description',
+    { tag: '@smoke' },
+    async ({ productDetailPage }) => {
+      const description = await productDetailPage.getItemDescription();
+      // > 10 chars after trimming is a pragmatic minimum; the shortest SauceDemo description is ~30 chars
+      expect(description.trim().length, {
+        message: `Description was: "${description}"`,
+      }).toBeGreaterThanOrEqual(10);
+    }
+  );
 
-  test('should display a description distinct from the item name', { tag: '@smoke' }, async ({ productDetailPage }) => {
-    // compared against firstName captured from inventory listing in beforeEach
-    const description = await productDetailPage.getItemDescription();
-    expect(description, { message: `Description "${description}" must not equal item name "${firstName}"` }).not.toBe(firstName);
-  });
+  test(
+    'should display a description distinct from the item name',
+    { tag: '@smoke' },
+    async ({ productDetailPage }) => {
+      // compared against firstName captured from inventory listing in beforeEach
+      const description = await productDetailPage.getItemDescription();
+      expect(description, {
+        message: `Description "${description}" must not equal item name "${firstName}"`,
+      }).not.toBe(firstName);
+    }
+  );
 
   test('should display the item image', { tag: '@smoke' }, async ({ productDetailPage }) => {
     // stronger than toBeVisible — confirms a real src is present, not just that the element exists
@@ -76,7 +92,7 @@ test.describe('Product Detail Page', () => {
       // so each test gets a fresh browser page with an empty session storage
       await productDetailPage.addToCart();
       await expect(productDetailPage.cartBadge).toHaveText('1');
-    },
+    }
   );
 
   test(
@@ -85,9 +101,13 @@ test.describe('Product Detail Page', () => {
     async ({ productDetailPage }) => {
       await productDetailPage.addToCart();
       // both assertions together confirm the mutually exclusive button-state toggle
-      await expect(productDetailPage.removeButton).toBeVisible({ message: 'Remove button should be visible after item is added' });
-      await expect(productDetailPage.addToCartButton).toBeHidden({ message: 'Add to Cart button should be hidden after item is added' });
-    },
+      await expect(productDetailPage.removeButton).toBeVisible({
+        message: 'Remove button should be visible after item is added',
+      });
+      await expect(productDetailPage.addToCartButton).toBeHidden({
+        message: 'Add to Cart button should be hidden after item is added',
+      });
+    }
   );
 
   test(
@@ -98,10 +118,16 @@ test.describe('Product Detail Page', () => {
       await productDetailPage.addToCart();
       await productDetailPage.removeFromCart();
       // three assertions confirm the full reset: empty cart, Add to Cart restored, Remove hidden
-      await expect(productDetailPage.cartBadge).toBeHidden({ message: 'Cart badge should be absent after removing the item' });
-      await expect(productDetailPage.addToCartButton).toBeVisible({ message: 'Add to Cart button should be visible after removing the item' });
-      await expect(productDetailPage.removeButton).toBeHidden({ message: 'Remove button should be hidden after item is removed' });
-    },
+      await expect(productDetailPage.cartBadge).toBeHidden({
+        message: 'Cart badge should be absent after removing the item',
+      });
+      await expect(productDetailPage.addToCartButton).toBeVisible({
+        message: 'Add to Cart button should be visible after removing the item',
+      });
+      await expect(productDetailPage.removeButton).toBeHidden({
+        message: 'Remove button should be hidden after item is removed',
+      });
+    }
   );
 
   test(
@@ -112,18 +138,21 @@ test.describe('Product Detail Page', () => {
       // both assertions confirm a full page load: correct URL and visible content
       await expect(page).toHaveURL(/\/inventory\.html$/);
       await expect(inventoryPage.inventoryContainer).toBeVisible();
-    },
+    }
   );
 
-  test('should preserve cart badge count on return to inventory', { tag: '@smoke' }, async ({
-    inventoryPage,
-    productDetailPage,
-  }) => {
-    // self-contained: addToCart() called here so this test does not depend on prior test state
-    await expect(productDetailPage.cartBadge).toBeHidden({ message: 'Cart badge should be absent before adding to cart' }); // assert clean precondition
-    await productDetailPage.addToCart();
-    await expect(productDetailPage.cartBadge).toHaveText('1'); // confirm badge set on detail page before navigating
-    await productDetailPage.goBack();
-    await expect(inventoryPage.cartBadge).toHaveText('1');
-  });
+  test(
+    'should preserve cart badge count on return to inventory',
+    { tag: '@smoke' },
+    async ({ inventoryPage, productDetailPage }) => {
+      // self-contained: addToCart() called here so this test does not depend on prior test state
+      await expect(productDetailPage.cartBadge).toBeHidden({
+        message: 'Cart badge should be absent before adding to cart',
+      }); // assert clean precondition
+      await productDetailPage.addToCart();
+      await expect(productDetailPage.cartBadge).toHaveText('1'); // confirm badge set on detail page before navigating
+      await productDetailPage.goBack();
+      await expect(inventoryPage.cartBadge).toHaveText('1');
+    }
+  );
 });
