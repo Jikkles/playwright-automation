@@ -43,7 +43,11 @@ export class CheckoutPage extends BasePage {
   }
 
   /** Fills customer info fields. Does not submit — call submitCustomerInfo() separately. */
-  public async fillCustomerInfo(firstName: string, lastName: string, postalCode: string): Promise<void> {
+  public async fillCustomerInfo(
+    firstName: string,
+    lastName: string,
+    postalCode: string
+  ): Promise<void> {
     await this.firstNameInput.fill(firstName);
     await this.lastNameInput.fill(lastName);
     await this.postalCodeInput.fill(postalCode);
