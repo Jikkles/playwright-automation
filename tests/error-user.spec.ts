@@ -34,6 +34,8 @@ test.describe('Error User - Degraded UX', () => {
     );
     await inventoryPage.sortBy('za');
     const names = await inventoryPage.getItemNames();
+    // WARNING: expectedZA is derived from names — if this fixme is ever removed,
+    // replace with a hard-coded expected order; otherwise the assertion trivially passes
     const expectedZA = [...names].sort((a, b) => b.localeCompare(a));
     expect(names).toEqual(expectedZA);
   });

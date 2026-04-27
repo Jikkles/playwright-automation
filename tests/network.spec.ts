@@ -1,5 +1,7 @@
 import { test, expect } from '../fixtures';
 
+const EXPECTED_ITEM_COUNT = 6;
+
 test.describe('Network resilience', () => {
   test('should display item names and prices when product images fail to load', async ({
     page,
@@ -9,8 +11,8 @@ test.describe('Network resilience', () => {
     await page.goto('/inventory.html');
     const names = await inventoryPage.getItemNames();
     const prices = await inventoryPage.getItemPrices();
-    expect(names.length).toBeGreaterThan(0);
-    expect(prices.length).toBeGreaterThan(0);
+    expect(names).toHaveLength(EXPECTED_ITEM_COUNT);
+    expect(prices).toHaveLength(EXPECTED_ITEM_COUNT);
   });
 
   test('should complete cart operations when non-critical resources are blocked', async ({
@@ -34,8 +36,9 @@ test.describe('Network resilience', () => {
       await route.continue();
     });
     await page.goto('/inventory.html');
+    await page.waitForLoadState('networkidle');
     const names = await inventoryPage.getItemNames();
-    expect(names.length).toBeGreaterThan(0);
+    expect(names).toHaveLength(EXPECTED_ITEM_COUNT);
     expect(imageRequestCount).toBeGreaterThan(0);
   });
 

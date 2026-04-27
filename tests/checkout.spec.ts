@@ -7,7 +7,7 @@ test.describe('Checkout', () => {
     await inventoryPage.addFirstItemToCart();
     await inventoryPage.goToCart();
     await cartPage.proceedToCheckout();
-    await expect(page).toHaveURL('/checkout-step-one.html');
+    await page.waitForURL('/checkout-step-one.html');
   });
 
   test.describe('Step 1 - Customer Information', () => {
@@ -57,7 +57,7 @@ test.describe('Checkout', () => {
         customer.postalCode
       );
       await checkoutPage.submitCustomerInfo();
-      await expect(page).toHaveURL('/checkout-step-two.html');
+      await page.waitForURL('/checkout-step-two.html');
     });
 
     test('should cancel and return to inventory', async ({ page, checkoutPage }) => {
@@ -65,12 +65,16 @@ test.describe('Checkout', () => {
       await expect(page).toHaveURL('/inventory.html');
     });
 
-    test('should display subtotal, tax, and correct total', async ({ checkoutPage }) => {
-      const subtotal = await checkoutPage.getSubtotal();
-      const tax = await checkoutPage.getTax();
-      const total = await checkoutPage.getTotal();
-      expect(total).toBe(parseFloat((subtotal + tax).toFixed(2)));
-    });
+    test(
+      'should display subtotal, tax, and correct total',
+      { tag: '@smoke' },
+      async ({ checkoutPage }) => {
+        const subtotal = await checkoutPage.getSubtotal();
+        const tax = await checkoutPage.getTax();
+        const total = await checkoutPage.getTotal();
+        expect(total).toBe(parseFloat((subtotal + tax).toFixed(2)));
+      }
+    );
 
     test('should display overview page title', async ({ checkoutPage }) => {
       await expect(checkoutPage.pageTitle).toHaveText('Checkout: Overview');
@@ -79,17 +83,18 @@ test.describe('Checkout', () => {
 });
 
 test.describe('Checkout - Customer profile variations', () => {
+  test.beforeEach(async ({ page, inventoryPage, cartPage }) => {
+    await page.goto('/inventory.html');
+    await inventoryPage.addFirstItemToCart();
+    await inventoryPage.goToCart();
+    await cartPage.proceedToCheckout();
+  });
+
   for (const profile of customers) {
     test(`should advance to step 2 with profile: ${profile.label}`, async ({
       page,
-      inventoryPage,
-      cartPage,
       checkoutPage,
     }) => {
-      await page.goto('/inventory.html');
-      await inventoryPage.addFirstItemToCart();
-      await inventoryPage.goToCart();
-      await cartPage.proceedToCheckout();
       await checkoutPage.fillCustomerInfo(profile.firstName, profile.lastName, profile.postalCode);
       await checkoutPage.submitCustomerInfo();
       await expect(page).toHaveURL('/checkout-step-two.html');
