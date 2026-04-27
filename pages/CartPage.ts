@@ -24,20 +24,20 @@ export class CartPage extends BasePage {
     this.continueShoppingButton = page.locator('[data-test="continue-shopping"]');
   }
 
-  async getCartItemCount(): Promise<number> {
-    return this.cartItems.count();
+  public async getCartItemCount(): Promise<number> {
+    return await this.cartItems.count();
   }
 
-  async getCartItemNames(): Promise<string[]> {
+  public async getCartItemNames(): Promise<string[]> {
     return (await this.cartItemNames.allTextContents()).map((s) => s.trim());
   }
 
-  async getCartItemPrices(): Promise<number[]> {
+  public async getCartItemPrices(): Promise<number[]> {
     const priceTexts = await this.cartItemPrices.allTextContents();
     return priceTexts.map((p) => parseCurrency(p));
   }
 
-  async getCartItemQuantities(): Promise<number[]> {
+  public async getCartItemQuantities(): Promise<number[]> {
     const quantityTexts = await this.cartItemQuantities.allTextContents();
     return quantityTexts.map((q) => {
       const n = parseInt(q.trim(), 10);
@@ -46,11 +46,11 @@ export class CartPage extends BasePage {
     });
   }
 
-  async removeFirstItem(): Promise<void> {
+  public async removeFirstItem(): Promise<void> {
     await this.removeButtons.first().click();
   }
 
-  async removeItemByName(name: string): Promise<void> {
+  public async removeItemByName(name: string): Promise<void> {
     // filter on the name sub-element with an exact-match regex to avoid substring collisions
     const nameLocator = this.page.locator('[data-test="inventory-item-name"]').filter({
       hasText: new RegExp(`^${name}$`),
@@ -59,11 +59,11 @@ export class CartPage extends BasePage {
     await row.locator('button[data-test*="remove"]').click();
   }
 
-  async proceedToCheckout(): Promise<void> {
+  public async proceedToCheckout(): Promise<void> {
     await this.checkoutButton.click();
   }
 
-  async continueShopping(): Promise<void> {
+  public async continueShopping(): Promise<void> {
     await this.continueShoppingButton.click();
   }
 }

@@ -43,42 +43,42 @@ export class CheckoutPage extends BasePage {
   }
 
   /** Fills customer info fields. Does not submit — call submitCustomerInfo() separately. */
-  async fillCustomerInfo(firstName: string, lastName: string, postalCode: string): Promise<void> {
+  public async fillCustomerInfo(firstName: string, lastName: string, postalCode: string): Promise<void> {
     await this.firstNameInput.fill(firstName);
     await this.lastNameInput.fill(lastName);
     await this.postalCodeInput.fill(postalCode);
   }
 
   /** Submits the customer information form filled by fillCustomerInfo(). */
-  async submitCustomerInfo(): Promise<void> {
+  public async submitCustomerInfo(): Promise<void> {
     await this.continueButton.click();
   }
 
-  async finish(): Promise<void> {
+  public async finish(): Promise<void> {
     await this.finishButton.click();
   }
 
-  async cancel(): Promise<void> {
+  public async cancel(): Promise<void> {
     await this.cancelButton.click();
   }
 
-  async backToProducts(): Promise<void> {
+  public async backToProducts(): Promise<void> {
     await this.backToProductsButton.click();
   }
 
-  async getOverviewItemNames(): Promise<string[]> {
-    return this.overviewItemNames.allTextContents();
+  public async getOverviewItemNames(): Promise<string[]> {
+    return await this.overviewItemNames.allTextContents();
   }
 
-  async getSubtotal(): Promise<number> {
-    return parseCurrency((await this.subtotalLabel.textContent()) ?? '');
+  public async getSubtotal(): Promise<number> {
+    return parseCurrency(await this.readText(this.subtotalLabel, 'Subtotal'));
   }
 
-  async getTax(): Promise<number> {
-    return parseCurrency((await this.taxLabel.textContent()) ?? '');
+  public async getTax(): Promise<number> {
+    return parseCurrency(await this.readText(this.taxLabel, 'Tax'));
   }
 
-  async getTotal(): Promise<number> {
-    return parseCurrency((await this.totalLabel.textContent()) ?? '');
+  public async getTotal(): Promise<number> {
+    return parseCurrency(await this.readText(this.totalLabel, 'Total'));
   }
 }

@@ -8,7 +8,7 @@ test.describe('Navigation - Burger Menu', () => {
   test('should logout and redirect to login page', async ({ page, inventoryPage, loginPage }) => {
     await inventoryPage.logout();
     await expect(page).toHaveURL('/');
-    await expect(loginPage.getLoginButton()).toBeVisible();
+    await expect(loginPage.loginButton).toBeVisible();
   });
 
   test('should not allow access to inventory after logout', async ({ page, inventoryPage }) => {
