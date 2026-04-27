@@ -1,12 +1,10 @@
 import { Page, Locator } from '@playwright/test';
-import AxeBuilder from '@axe-core/playwright';
 
 export abstract class BasePage {
   protected readonly page: Page;
-  // Burger menu uses stable element IDs; no data-test attributes exist on these elements.
-  // openBurgerMenu/closeBurgerMenu remain public so navigation tests can exercise them directly.
-  // burgerMenuClose is internal-only; all other burger locators are public for visibility assertions.
+  // SauceDemo provides no data-test attributes on burger menu elements; stable element IDs are used instead.
   public readonly burgerMenuButton: Locator;
+  // protected rather than public — no test ever needs a locator assertion on the close button
   protected readonly burgerMenuClose: Locator;
   public readonly burgerMenuAllItems: Locator;
   public readonly burgerMenuLogout: Locator;
@@ -29,53 +27,44 @@ export abstract class BasePage {
     this.pageTitle = page.locator('[data-test="title"]');
   }
 
-  async openBurgerMenu(): Promise<void> {
+  public async openBurgerMenu(): Promise<void> {
     await this.burgerMenuButton.click();
   }
 
-  async closeBurgerMenu(): Promise<void> {
+  public async closeBurgerMenu(): Promise<void> {
     await this.burgerMenuClose.click();
   }
 
-  async logout(): Promise<void> {
+  public async logout(): Promise<void> {
     await this.openBurgerMenu();
     await this.burgerMenuLogout.click();
   }
 
-  async resetAppState(): Promise<void> {
+  public async resetAppState(): Promise<void> {
     await this.openBurgerMenu();
     await this.burgerMenuReset.click();
   }
 
-  async navigateToAllItems(): Promise<void> {
+  public async navigateToAllItems(): Promise<void> {
     await this.openBurgerMenu();
     await this.burgerMenuAllItems.click();
   }
 
-  async goToCart(): Promise<void> {
+  public async goToCart(): Promise<void> {
     await this.cartIcon.click();
   }
 
-  async getCartBadgeCount(): Promise<number> {
-    // badge element is absent when cart is empty
-    if (!(await this.cartBadge.isVisible())) return 0;
-    const text = (await this.cartBadge.textContent()) ?? '0';
+  // point-in-time snapshot — do not use as a synchronisation point; prefer expect(cartBadge).toHaveText() for retrying assertions
+  public async getCartBadgeCount(): Promise<number> {
+    const text = await this.cartBadge.textContent();
+    // null means the badge element is absent from the DOM — cart is empty
+    if (!text) return 0;
     const count = parseInt(text, 10);
     if (isNaN(count)) throw new Error(`Could not parse cart badge count from: "${text}"`);
     return count;
   }
 
-  async checkAccessibility(): Promise<void> {
-    const results = await new AxeBuilder({ page: this.page }).analyze();
-    if (results.violations.length > 0) {
-      const summary = results.violations
-        .map((v) => `[${v.impact}] ${v.id}: ${v.description}`)
-        .join('\n');
-      throw new Error(`Accessibility violations found:\n${summary}`);
-    }
-  }
-
-  // innerText() auto-waits for the element to be visible before returning
+  // innerText() waits for the element to be visible and stable (uses Playwright's action timeout)
   protected async readText(locator: Locator, field: string): Promise<string> {
     const raw = await locator.innerText();
     if (!raw.trim()) throw new Error(`${field} element returned empty text`);

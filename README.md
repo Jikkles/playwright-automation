@@ -20,17 +20,39 @@ An end-to-end test automation framework built with Playwright and TypeScript, de
 ```
 playwright-automation/
 ├── fixtures/
-│   └── index.ts            # Extended test with all page object fixtures
-├── pages/                  # Page Object Model classes
+│   └── index.ts                # Extended test with all page object fixtures
+├── pages/
+│   ├── BasePage.ts             # Abstract base — shared nav chrome for authenticated pages
+│   ├── LoginPage.ts
+│   ├── InventoryPage.ts
+│   ├── CartPage.ts
+│   ├── CheckoutPage.ts
+│   └── ProductDetailPage.ts
 ├── tests/
-│   ├── auth.setup.ts       # One-time auth setup — saves browser storage state
-│   └── *.spec.ts           # Test specs organised by feature
-├── data/                   # Externalised test data and credentials
+│   ├── auth.setup.ts           # One-time auth setup — saves browser storage state
+│   ├── accessibility.spec.ts
+│   ├── cart.spec.ts
+│   ├── checkout.spec.ts
+│   ├── e2e.spec.ts
+│   ├── error-user.spec.ts
+│   ├── inventory.spec.ts
+│   ├── login.spec.ts
+│   ├── navigation.spec.ts
+│   ├── network.spec.ts
+│   ├── problem-user.spec.ts
+│   └── product-detail.spec.ts
+├── data/
+│   ├── accessibility.ts        # Standalone axe-core accessibility helper
+│   ├── checkout.ts             # Customer fixture data
+│   ├── credentials.ts          # Test user credentials (reads from env vars)
+│   └── utils.ts                # Shared utilities (e.g. parseCurrency, SortOption)
 ├── .github/
-│   └── workflows/          # GitHub Actions CI configuration
-├── .env                    # Environment variable overrides (gitignored)
-├── eslint.config.cjs       # ESLint configuration
-├── .prettierrc.json        # Prettier configuration
+│   └── workflows/              # GitHub Actions CI configuration
+├── .githooks/
+│   └── pre-push                # Blocks push if branch is behind origin/main
+├── .env                        # Environment variable overrides (gitignored)
+├── eslint.config.cjs           # ESLint configuration
+├── .prettierrc.json            # Prettier configuration
 ├── playwright.config.ts
 └── tsconfig.json
 ```
@@ -49,7 +71,7 @@ playwright-automation/
 - **Failure artefacts** — Screenshots and video automatically captured on failure, traces on first retry
 - **CI/CD pipeline** — Automated runs on every push and PR via GitHub Actions with browser caching
 - **Allure reporting** — Rich interactive reports with step-level timings, inline attachments, and trend history across CI runs
-- **Accessibility testing** — Automated WCAG 2 AA scans via axe-core on all key pages (login, inventory, cart, checkout)
+- **Accessibility testing** — Automated WCAG 2 AA scans via axe-core on all key pages; encapsulated in a standalone `data/accessibility.ts` helper rather than coupled to page objects
 - **Network resilience tests** — `page.route()` interception tests verify core functionality survives resource failures
 - **Parameterised test data** — Checkout flow validated across multiple customer profiles covering different name formats and postal code conventions
 - **Dependency automation** — Dependabot raises weekly PRs for npm packages and GitHub Actions pins
@@ -118,13 +140,15 @@ npm run format:check
 npm run typecheck
 ```
 
+A local pre-commit hook at `.git/hooks/pre-commit` runs `format:check` and `lint` automatically before every commit, blocking it if either fails. Run `npm run format` or `npm run lint:fix` to resolve issues, then re-stage and commit.
+
 ## 🌐 Test Target
 
 Tests run against [Sauce Demo](https://www.saucedemo.com/), a purpose-built e-commerce demo application commonly used for automation practice. Six test user profiles are available, covering standard behaviour, locked-out users, degraded UX, and performance simulation.
 
 ## 📋 CI/CD
 
-Tests execute automatically on every push and pull request to `main` via GitHub Actions on `ubuntu-24.04`. The pipeline runs a **quality gate first** (lint, formatting, TypeScript type check, `npm audit`) before tests are allowed to start. If quality passes, the full Chromium, Firefox, and WebKit suite runs with 4 parallel workers. Playwright browsers are cached by a hash of `package-lock.json` and `playwright.config.ts`, so the cache auto-invalidates when the browser list changes. After the run, a minimum test count is asserted to catch accidental spec file deletion. Both the HTML report and Allure report are uploaded as build artefacts with a 5-day retention window. Allure history is persisted across runs via the Actions cache, enabling trend charts from the second run onward.
+Tests execute automatically on every push and pull request to `main` via GitHub Actions on `ubuntu-24.04`. The pipeline runs a **quality gate first** (lint, formatting, TypeScript type check via `tsc --noEmit`, `npm audit`) before tests are allowed to start. If quality passes, the full Chromium, Firefox, and WebKit suite runs with 4 parallel workers. Playwright browsers are cached by a hash of `package-lock.json` and `playwright.config.ts`, so the cache auto-invalidates when the browser list changes. After the run, a minimum test count is asserted to catch accidental spec file deletion. Both the HTML report and Allure report are uploaded as build artefacts with a 5-day retention window. Allure history is persisted across runs via the Actions cache, enabling trend charts from the second run onward.
 
 ## 🔀 Branch workflow
 
@@ -147,4 +171,9 @@ A pre-push hook in `.githooks/pre-push` enforces this — it blocks the push and
 - [x] Accessibility (WCAG) test coverage via axe-core
 - [x] Network resilience tests
 - [x] Automated dependency updates via Dependabot
-- [ ] API test layer for faster setup and teardown
+- [ ] API test layer — replace UI-driven `beforeEach` setup with direct API calls to seed and reset state faster
+- [ ] Mobile device emulation — run the smoke suite against Playwright's built-in device descriptors (iPhone, Pixel, etc.)
+- [ ] Multi-environment support — structured `.env.staging` / `.env.prod` profiles so the same suite targets any environment without manual config edits
+- [ ] Soft assertions — adopt `expect.soft()` in validation-heavy tests (e.g. checkout overview) to collect all failures before stopping
+- [ ] CI test sharding — split the suite across parallel runners using `--shard` to reduce wall-clock time as coverage grows
+- [ ] CI failure notifications — post a summary to Slack or email when the `main` pipeline fails
