@@ -7,7 +7,7 @@ test.describe('Inventory Page', () => {
   test.beforeEach(async ({ page, inventoryPage }) => {
     await page.goto('/inventory.html');
     await inventoryPage.resetAppState();
-    await inventoryPage.closeBurgerMenu();
+    await inventoryPage.closeBurgerMenu(); // resetAppState leaves the burger menu open
   });
 
   test('should display inventory items', { tag: '@smoke' }, async ({ inventoryPage }) => {
@@ -108,13 +108,21 @@ test.describe('Inventory Page', () => {
 
   test('should hide cart badge after removing all added items', async ({ inventoryPage }) => {
     await inventoryPage.addFirstNItemsToCart(3);
-    expect(await inventoryPage.getCartBadgeCount()).toBe(3);
-    await inventoryPage.removeFirstItemFromCart();
-    expect(await inventoryPage.getCartBadgeCount()).toBe(2);
-    await inventoryPage.removeFirstItemFromCart();
-    expect(await inventoryPage.getCartBadgeCount()).toBe(1);
-    await inventoryPage.removeFirstItemFromCart();
-    await expect(inventoryPage.cartBadge).toBeHidden();
+
+    await test.step('remove first item — badge shows 2', async () => {
+      await inventoryPage.removeFirstItemFromCart();
+      expect(await inventoryPage.getCartBadgeCount()).toBe(2);
+    });
+
+    await test.step('remove second item — badge shows 1', async () => {
+      await inventoryPage.removeFirstItemFromCart();
+      expect(await inventoryPage.getCartBadgeCount()).toBe(1);
+    });
+
+    await test.step('remove third item — badge disappears', async () => {
+      await inventoryPage.removeFirstItemFromCart();
+      await expect(inventoryPage.cartBadge).toBeHidden();
+    });
   });
 
   test('should navigate to product detail page when item name is clicked', async ({

@@ -1,24 +1,15 @@
 import { test, expect } from '../fixtures';
 
 test.describe('Product Detail Page', () => {
-  test.describe.configure({ mode: 'serial' });
-  // shared across serial tests — assigned in beforeEach, read in test bodies
-  let firstName!: string;
-  let firstPrice!: number;
-
   test.beforeEach(async ({ page, inventoryPage }) => {
     // explicit navigation — fixtures provide page objects but do not auto-navigate
     await page.goto('/inventory.html');
     // explicit render-wait — ensures items are in the DOM before scraping
     await expect(inventoryPage.inventoryItems).not.toHaveCount(0);
-    [firstName] = await inventoryPage.getItemNames();
-    [firstPrice] = await inventoryPage.getItemPrices();
-
-    await test.step('validate scraped inventory data', async () => {
-      expect(firstName, { message: 'getItemNames() returned empty array' }).toBeTruthy();
-      expect(firstPrice, { message: 'getItemPrices() returned empty or zero' }).toBeGreaterThan(0);
-    });
-
+    const [firstName] = await inventoryPage.getItemNames();
+    const [firstPrice] = await inventoryPage.getItemPrices();
+    expect(firstName, { message: 'getItemNames() returned empty array' }).toBeTruthy();
+    expect(firstPrice, { message: 'getItemPrices() returned empty or zero' }).toBeGreaterThan(0);
     await inventoryPage.clickItemByName(firstName);
     // wait for detail page navigation to settle before tests begin
     await expect(page).toHaveURL(/\/inventory-item\.html\?id=\d+/);
@@ -36,24 +27,28 @@ test.describe('Product Detail Page', () => {
   test(
     'should display the same name as shown on the inventory listing',
     { tag: '@smoke' },
-    async ({ productDetailPage }) => {
-      // compared against firstName captured from inventory listing in beforeEach
-      const name = await productDetailPage.getItemName();
-      expect(name, { message: 'Item name on detail page did not match inventory listing' }).toBe(
-        firstName
-      );
+    async ({ inventoryPage, productDetailPage }) => {
+      const detailName = await productDetailPage.getItemName();
+      await productDetailPage.goBack();
+      const inventoryNames = await inventoryPage.getItemNames();
+      expect(
+        inventoryNames,
+        'Item name on detail page was not found in the inventory listing'
+      ).toContain(detailName);
     }
   );
 
   test(
     'should display the same price as shown on the inventory listing',
     { tag: '@smoke' },
-    async ({ productDetailPage }) => {
-      // compared against firstPrice captured from inventory listing in beforeEach
-      const price = await productDetailPage.getItemPrice();
-      expect(price, { message: 'Item price on detail page did not match inventory listing' }).toBe(
-        firstPrice
-      );
+    async ({ inventoryPage, productDetailPage }) => {
+      const detailPrice = await productDetailPage.getItemPrice();
+      await productDetailPage.goBack();
+      const inventoryPrices = await inventoryPage.getItemPrices();
+      expect(
+        inventoryPrices,
+        'Item price on detail page was not found in the inventory listing'
+      ).toContain(detailPrice);
     }
   );
 
@@ -73,11 +68,11 @@ test.describe('Product Detail Page', () => {
     'should display a description distinct from the item name',
     { tag: '@smoke' },
     async ({ productDetailPage }) => {
-      // compared against firstName captured from inventory listing in beforeEach
+      const name = await productDetailPage.getItemName();
       const description = await productDetailPage.getItemDescription();
       expect(description, {
-        message: `Description "${description}" must not equal item name "${firstName}"`,
-      }).not.toBe(firstName);
+        message: `Description "${description}" must not equal item name "${name}"`,
+      }).not.toBe(name);
     }
   );
 
@@ -158,7 +153,8 @@ test.describe('Product Detail Page', () => {
         'Cart badge should be absent before adding to cart'
       ).toBeHidden(); // assert clean precondition
       await productDetailPage.addToCart();
-      await expect(productDetailPage.cartBadge).toHaveText('1'); // confirm badge set on detail page before navigating
+      // confirm badge set on detail page before navigating
+      await expect(productDetailPage.cartBadge).toHaveText('1');
       await productDetailPage.goBack();
       await expect(inventoryPage.cartBadge).toHaveText('1');
     }

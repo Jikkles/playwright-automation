@@ -1,5 +1,4 @@
 import { test, expect } from '../fixtures';
-import AxeBuilder from '@axe-core/playwright';
 import { customer } from '../data/checkout';
 import { checkAccessibility } from '../data/accessibility';
 
@@ -20,8 +19,7 @@ test.describe('Accessibility - Login page', () => {
       'SauceDemo upstream: missing <main> landmark, no <h1> heading, content outside landmark regions'
     );
     await loginPage.goto();
-    const results = await new AxeBuilder({ page }).analyze();
-    expect(results.violations).toHaveLength(0);
+    await checkAccessibility(page);
   });
 });
 

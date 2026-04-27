@@ -60,13 +60,15 @@ test.describe('Problem User - Degraded UX', () => {
   });
 });
 
+const GLITCH_USER_LOGIN_TIMEOUT_MS = 15_000;
+
 test.describe('Performance Glitch User', () => {
   test.use({ storageState: { cookies: [], origins: [] } });
 
   test.beforeEach(async ({ page, loginPage }) => {
     await loginPage.goto();
     await loginPage.loginAsPerformanceGlitchUser();
-    await expect(page).toHaveURL('/inventory.html', { timeout: 15000 });
+    await expect(page).toHaveURL('/inventory.html', { timeout: GLITCH_USER_LOGIN_TIMEOUT_MS });
   });
 
   test('should log in successfully despite artificial delay', async ({ page }) => {
