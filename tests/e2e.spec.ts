@@ -45,7 +45,7 @@ test.describe('End-to-end: complete purchase flow', () => {
           customer.lastName,
           customer.postalCode
         );
-        await checkoutPage.continue();
+        await checkoutPage.submitCustomerInfo();
       });
 
       await test.step('Verify order overview and financial totals', async () => {

@@ -119,45 +119,13 @@ When the user asks to review recent code, check code quality, or similar, announ
 > "🔍 Running code-reviewer on `<filename>`..."
 > Then invoke the `code-reviewer` agent on the relevant file(s) and display the full output.
 
-### After editing a file in `tests/` — Test File Workflow
+### After editing a file in `tests/` or `pages/` — Review Workflow
 
-Run this loop automatically after every `Edit` or `Write` to any file in `tests/`. Do not ask for confirmation.
-
-1. Announce in chat: "🔍 Running code-reviewer on `<filename>`..."
-2. Invoke the `code-reviewer` agent on the file and display the full review output inline.
-3. Display all 🟢 Suggestions to the user, then fix every 🔴 Blocking, 🟡 Warning, and 🟢 Suggestion issue.
-4. Run only the tests in files that were changed, using `--grep` with a pattern matching the names of added or modified tests:
-   `cd playwright-automation && npx playwright test <filename> --grep "test name 1|test name 2"`
-   If a page file was also changed, additionally run the spec files that use that page object, scoped to affected tests where possible. Do not run the full suite.
-5. If tests fail: fix the failures, then go back to step 4.
-6. When all tests pass: re-invoke the `code-reviewer` agent.
-7. If the new verdict is **Changes requested** or **Approved with minor comments**, go back to step 3.
-8. Repeat until the verdict is **Approved** AND all tests pass.
-9. Output the end-of-session summary (see below).
-
-### After editing a file in `pages/` — Page File Workflow
-
-Run this loop automatically after every `Edit` or `Write` to any file in `pages/`. Do not ask for confirmation.
+Run automatically after every `Edit` or `Write` to any file in `tests/` or `pages/`. Do not ask for confirmation.
 
 1. Announce in chat: "🔍 Running code-reviewer on `<filename>`..."
 2. Invoke the `code-reviewer` agent on the file and display the full review output inline.
-3. Display all 🟢 Suggestions to the user, then fix every 🔴 Blocking, 🟡 Warning, and 🟢 Suggestion issue.
-4. Re-invoke the `code-reviewer` agent.
-5. If the new verdict is **Changes requested** or **Approved with minor comments**, go back to step 3.
-6. Repeat until the verdict is **Approved**.
-7. Output the end-of-session summary (see below).
-
-### End-of-session summary
-
-When the loop completes, output a clearly labelled summary:
-
-**✅ Code Review Complete — `<filename>`**
-| # | Change | Line(s) |
-|---|--------|---------|
-| 1 | Description of each fix/change made | line ref |
-
-- **Final verdict:** [reviewer verdict]
-- **Tests:** [All passing / N/A]
+3. Present the findings to the user and stop — do not automatically fix issues or re-run the reviewer.
 
 ## Conventions
 

@@ -3,17 +3,19 @@ import { BasePage } from './BasePage';
 import { parseCurrency } from '../data/utils';
 
 export class CartPage extends BasePage {
-  readonly cartItems: Locator;
-  readonly cartItemNames: Locator;
-  readonly cartItemPrices: Locator;
-  readonly cartItemQuantities: Locator;
-  readonly removeButtons: Locator;
-  readonly checkoutButton: Locator;
-  readonly continueShoppingButton: Locator;
+  // kept public to allow Playwright toHaveCount assertions in tests;
+  // no data-test attribute exists on the cart row wrapper
+  public readonly cartItems: Locator;
+  private readonly cartItemNames: Locator;
+  private readonly cartItemPrices: Locator;
+  private readonly cartItemQuantities: Locator;
+  private readonly removeButtons: Locator;
+  private readonly checkoutButton: Locator;
+  private readonly continueShoppingButton: Locator;
 
   constructor(page: Page) {
     super(page);
-    this.cartItems = page.locator('.cart_item'); // no data-test on the cart row wrapper
+    this.cartItems = page.locator('.cart_item');
     this.cartItemNames = page.locator('[data-test="inventory-item-name"]');
     this.cartItemPrices = page.locator('[data-test="inventory-item-price"]');
     this.cartItemQuantities = page.locator('[data-test="item-quantity"]');
@@ -35,12 +37,26 @@ export class CartPage extends BasePage {
     return priceTexts.map((p) => parseCurrency(p));
   }
 
-  async getCartItemQuantities(): Promise<string[]> {
-    return (await this.cartItemQuantities.allTextContents()).map((s) => s.trim());
+  async getCartItemQuantities(): Promise<number[]> {
+    const quantityTexts = await this.cartItemQuantities.allTextContents();
+    return quantityTexts.map((q) => {
+      const n = parseInt(q.trim(), 10);
+      if (isNaN(n)) throw new Error(`Could not parse cart item quantity from: "${q}"`);
+      return n;
+    });
   }
 
   async removeFirstItem(): Promise<void> {
     await this.removeButtons.first().click();
+  }
+
+  async removeItemByName(name: string): Promise<void> {
+    // filter on the name sub-element with an exact-match regex to avoid substring collisions
+    const nameLocator = this.page.locator('[data-test="inventory-item-name"]').filter({
+      hasText: new RegExp(`^${name}$`),
+    });
+    const row = this.cartItems.filter({ has: nameLocator });
+    await row.locator('button[data-test*="remove"]').click();
   }
 
   async proceedToCheckout(): Promise<void> {
