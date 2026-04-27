@@ -4,58 +4,57 @@ import { parseCurrency } from '../data/utils';
 
 export class ProductDetailPage extends BasePage {
   // kept public to allow Playwright toBeVisible assertions in tests
-  public readonly container: Locator;
+  public readonly itemImage: Locator;
+  // kept public to allow Playwright toBeVisible/toBeHidden assertions in tests;
+  // on the detail page the button has no item slug — data-test is exactly "add-to-cart".
+  public readonly addToCartButton: Locator;
+  // kept public to allow Playwright toBeVisible/toBeHidden assertions in tests;
+  // on the detail page the button has no item slug — data-test is exactly "remove".
+  public readonly removeButton: Locator;
+  // getItemName/Price/Description return async values — no locator getter needed;
+  // no test ever needs to make a locator assertion (e.g. toBeVisible) on these elements.
   private readonly itemName: Locator;
   private readonly itemDescription: Locator;
   private readonly itemPrice: Locator;
-  // kept public to allow Playwright toBeVisible assertions in tests
-  public readonly itemImage: Locator;
-  // kept public to allow Playwright toBeVisible/toBeHidden assertions in tests;
-  // attribute value includes the item slug (e.g. add-to-cart-sauce-labs-backpack), so prefix match is required.
-  public readonly addToCartButton: Locator;
-  // kept public to allow Playwright toBeVisible assertions in tests;
-  // attribute value includes the item slug with a dash separator (e.g. remove-sauce-labs-backpack).
-  public readonly removeButton: Locator;
+  // backButton is intentionally private — no test asserts on its visibility.
   private readonly backButton: Locator;
 
   constructor(page: Page) {
     super(page);
-    // SauceDemo provides no data-test attributes on detail page elements;
-    // CSS class selectors are the only stable option for this entire page object.
-    this.container = page.locator('.inventory_details_container');
+    // SauceDemo provides no data-test attributes on the detail page's content elements;
+    // CSS class selectors are the only stable option for name, description, price, and image.
+    // no data-test on detail image; element type anchors the selector
+    this.itemImage = page.locator('img.inventory_details_img');
     this.itemName = page.locator('.inventory_details_name');
     this.itemDescription = page.locator('.inventory_details_desc');
     this.itemPrice = page.locator('.inventory_details_price');
-    this.itemImage = page.locator('.inventory_details_img');
-    this.addToCartButton = page.locator('[data-test^="add-to-cart"]');
-    this.removeButton = page.locator('[data-test^="remove-"]');
+    this.addToCartButton = page.locator('[data-test="add-to-cart"]');
+    this.removeButton = page.locator('[data-test="remove"]');
     this.backButton = page.locator('[data-test="back-to-products"]');
   }
 
-  async addToCart(): Promise<void> {
+  public async addToCart(): Promise<void> {
     await this.addToCartButton.click();
   }
 
-  async removeFromCart(): Promise<void> {
+  public async removeFromCart(): Promise<void> {
     await this.removeButton.click();
   }
 
-  async goBack(): Promise<void> {
+  public async goBack(): Promise<void> {
     await this.backButton.click();
   }
 
-  async getItemName(): Promise<string> {
-    const text = await this.itemName.textContent();
-    if (text === null) throw new Error('Item name element returned null textContent');
-    return text.trim();
+  public async getItemName(): Promise<string> {
+    return this.readText(this.itemName, 'Item name');
   }
 
-  async getItemPrice(): Promise<number> {
-    const text = (await this.itemPrice.textContent()) ?? '';
-    return parseCurrency(text);
+  public async getItemPrice(): Promise<number> {
+    const raw = await this.readText(this.itemPrice, 'Item price');
+    return parseCurrency(raw);
   }
 
-  async getItemDescription(): Promise<string> {
-    return ((await this.itemDescription.textContent()) ?? '').trim();
+  public async getItemDescription(): Promise<string> {
+    return this.readText(this.itemDescription, 'Item description');
   }
 }

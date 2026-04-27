@@ -74,4 +74,11 @@ export abstract class BasePage {
       throw new Error(`Accessibility violations found:\n${summary}`);
     }
   }
+
+  // innerText() auto-waits for the element to be visible before returning
+  protected async readText(locator: Locator, field: string): Promise<string> {
+    const raw = await locator.innerText();
+    if (!raw.trim()) throw new Error(`${field} element returned empty text`);
+    return raw.trim();
+  }
 }
