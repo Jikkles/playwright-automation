@@ -13,7 +13,7 @@ export class InventoryPage extends BasePage {
   private readonly inventoryItemNames: Locator;
   private readonly inventoryItemPrices: Locator;
   private readonly inventoryItemDescriptions: Locator;
-  // kept public to allow Playwright toHaveCount assertions in tests
+  // kept public to allow Playwright toHaveCount / toBeVisible assertions in tests
   public readonly addToCartButtons: Locator;
   // kept public to allow Playwright toHaveCount / toBeVisible assertions in tests
   public readonly removeFromCartButtons: Locator;
@@ -31,16 +31,16 @@ export class InventoryPage extends BasePage {
     this.sortDropdown = page.locator('[data-test="product-sort-container"]');
   }
 
-  async clickItemByName(name: string): Promise<void> {
+  public async clickItemByName(name: string): Promise<void> {
     // exact-match regex prevents substring collisions between similar item names
     await this.inventoryItemNames.filter({ hasText: new RegExp(`^${name}$`) }).click();
   }
 
-  async addFirstItemToCart(): Promise<void> {
+  public async addFirstItemToCart(): Promise<void> {
     await this.addToCartButtons.first().click();
   }
 
-  async addFirstNItemsToCart(count: number): Promise<void> {
+  public async addFirstNItemsToCart(count: number): Promise<void> {
     const available = await this.addToCartButtons.count();
     if (count > available) {
       throw new Error(`Cannot add ${count} items: only ${available} add-to-cart buttons available`);
@@ -51,29 +51,29 @@ export class InventoryPage extends BasePage {
     }
   }
 
-  async addItemToCartByName(name: string): Promise<void> {
+  public async addItemToCartByName(name: string): Promise<void> {
     const item = this.inventoryItems.filter({ hasText: name });
     await item.locator(InventoryPage.ADD_TO_CART_SELECTOR).click();
   }
 
-  async removeFirstItemFromCart(): Promise<void> {
+  public async removeFirstItemFromCart(): Promise<void> {
     await this.removeFromCartButtons.first().click();
   }
 
-  async sortBy(option: SortOption): Promise<void> {
+  public async sortBy(option: SortOption): Promise<void> {
     await this.sortDropdown.selectOption(option);
   }
 
-  async getItemNames(): Promise<string[]> {
+  public async getItemNames(): Promise<string[]> {
     return (await this.inventoryItemNames.allTextContents()).map((s) => s.trim());
   }
 
-  async getItemPrices(): Promise<number[]> {
+  public async getItemPrices(): Promise<number[]> {
     const priceTexts = await this.inventoryItemPrices.allTextContents();
     return priceTexts.map((p) => parseCurrency(p));
   }
 
-  async getItemDescriptions(): Promise<string[]> {
+  public async getItemDescriptions(): Promise<string[]> {
     return (await this.inventoryItemDescriptions.allTextContents()).map((s) => s.trim());
   }
 }

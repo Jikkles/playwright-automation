@@ -9,9 +9,9 @@ export abstract class BasePage {
   public readonly burgerMenuAllItems: Locator;
   public readonly burgerMenuLogout: Locator;
   public readonly burgerMenuReset: Locator;
+  private readonly cartIcon: Locator;
   // cartBadge and pageTitle remain public so tests can use Playwright's auto-retrying locator assertions
   // (e.g. toHaveText, toBeHidden) — getCartBadgeCount() returns a number and cannot replace these.
-  public readonly cartIcon: Locator;
   public readonly cartBadge: Locator;
   public readonly pageTitle: Locator;
 
