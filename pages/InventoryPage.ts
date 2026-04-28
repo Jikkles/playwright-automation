@@ -18,6 +18,7 @@ export class InventoryPage extends BasePage {
   // kept public to allow Playwright toHaveCount / toBeVisible assertions in tests
   public readonly removeFromCartButtons: Locator;
   private readonly sortDropdown: Locator;
+  private readonly inventoryItemImages: Locator;
 
   constructor(page: Page) {
     super(page);
@@ -29,11 +30,14 @@ export class InventoryPage extends BasePage {
     this.addToCartButtons = page.locator(InventoryPage.ADD_TO_CART_SELECTOR);
     this.removeFromCartButtons = page.locator('button[data-test*="remove"]');
     this.sortDropdown = page.locator('[data-test="product-sort-container"]');
+    this.inventoryItemImages = page.locator('[data-test="inventory-item"] img');
   }
 
   public async clickItemByName(name: string): Promise<void> {
-    // exact-match regex prevents substring collisions between similar item names
-    await this.inventoryItemNames.filter({ hasText: new RegExp(`^${name}$`) }).click();
+    // exact-match regex prevents substring collisions between similar item names;
+    // escape special chars so names like "Test.allTheThings() T-Shirt (Red)" are treated literally
+    const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    await this.inventoryItemNames.filter({ hasText: new RegExp(`^${escaped}$`) }).click();
   }
 
   public async addFirstItemToCart(): Promise<void> {
@@ -75,5 +79,22 @@ export class InventoryPage extends BasePage {
 
   public async getItemDescriptions(): Promise<string[]> {
     return (await this.inventoryItemDescriptions.allTextContents()).map((s) => s.trim());
+  }
+
+  public async getRawItemPriceTexts(): Promise<string[]> {
+    return (await this.inventoryItemPrices.allTextContents()).map((s) => s.trim());
+  }
+
+  public async clickFirstItemImage(): Promise<void> {
+    await this.inventoryItemImages.first().click();
+  }
+
+  public async getItemImageSrcs(): Promise<string[]> {
+    const count = await this.inventoryItemImages.count();
+    const srcs: string[] = [];
+    for (let i = 0; i < count; i++) {
+      srcs.push((await this.inventoryItemImages.nth(i).getAttribute('src')) ?? '');
+    }
+    return srcs;
   }
 }

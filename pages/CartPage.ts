@@ -10,7 +10,8 @@ export class CartPage extends BasePage {
   private readonly cartItemPrices: Locator;
   private readonly cartItemQuantities: Locator;
   private readonly removeButtons: Locator;
-  private readonly checkoutButton: Locator;
+  // kept public to allow Playwright toBeVisible assertion in tests
+  public readonly checkoutButton: Locator;
   private readonly continueShoppingButton: Locator;
 
   constructor(page: Page) {
@@ -51,9 +52,11 @@ export class CartPage extends BasePage {
   }
 
   public async removeItemByName(name: string): Promise<void> {
-    // filter on the name sub-element with an exact-match regex to avoid substring collisions
+    // filter on the name sub-element with an exact-match regex to avoid substring collisions;
+    // escape special chars so names like "Test.allTheThings() T-Shirt (Red)" are treated literally
+    const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     const nameLocator = this.page.locator('[data-test="inventory-item-name"]').filter({
-      hasText: new RegExp(`^${name}$`),
+      hasText: new RegExp(`^${escaped}$`),
     });
     const row = this.cartItems.filter({ has: nameLocator });
     await row.locator('button[data-test*="remove"]').click();

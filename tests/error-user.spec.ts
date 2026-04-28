@@ -39,4 +39,23 @@ test.describe('Error User - Degraded UX', () => {
     const expectedZA = [...names].sort((a, b) => b.localeCompare(a));
     expect(names).toEqual(expectedZA);
   });
+
+  test(
+    'should display add-to-cart buttons for all 6 items',
+    { tag: '@regression' },
+    async ({ inventoryPage }) => {
+      await expect(inventoryPage.addToCartButtons).toHaveCount(6);
+    }
+  );
+
+  test(
+    'sort A to Z should maintain default order',
+    { tag: '@regression' },
+    async ({ inventoryPage }) => {
+      // A-to-Z sort works correctly for error_user — only Z-to-A and add-to-cart are broken
+      await inventoryPage.sortBy('az');
+      const names = await inventoryPage.getItemNames();
+      expect(names).toEqual([...names].sort((a, b) => a.localeCompare(b)));
+    }
+  );
 });

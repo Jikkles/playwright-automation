@@ -20,11 +20,13 @@ test.describe('Problem User - Degraded UX', () => {
   });
 
   test('sort Z to A does not reorder items (known bug)', async ({ inventoryPage }) => {
+    const namesBefore = await inventoryPage.getItemNames();
     await inventoryPage.sortBy('za');
-    const names = await inventoryPage.getItemNames();
-    const expectedZA = [...names].sort((a, b) => b.localeCompare(a));
+    const namesAfter = await inventoryPage.getItemNames();
+    // expectedZA derived from the pre-sort snapshot so a silently-fixed sort would be detected
+    const expectedZA = [...namesBefore].sort((a, b) => b.localeCompare(a));
     // Invert this assertion if the upstream sort bug is ever fixed
-    expect(names).not.toEqual(expectedZA);
+    expect(namesAfter).not.toEqual(expectedZA);
   });
 
   test('sort by price low to high does not reorder items (known bug)', async ({
@@ -58,6 +60,36 @@ test.describe('Problem User - Degraded UX', () => {
     await checkoutPage.submitCustomerInfo();
     await expect(page).toHaveURL('/checkout-step-two.html');
   });
+
+  test(
+    'last name field silently drops input — known bug',
+    { tag: '@regression' },
+    async ({ inventoryPage, cartPage, checkoutPage }) => {
+      await inventoryPage.addFirstItemToCart();
+      await inventoryPage.goToCart();
+      await cartPage.proceedToCheckout();
+      await checkoutPage.fillCustomerInfo(
+        customer.firstName,
+        customer.lastName,
+        customer.postalCode
+      );
+      // Inverted: last name field drops input so submission triggers a required-field error
+      await checkoutPage.submitCustomerInfo();
+      await expect(checkoutPage.errorMessage).toContainText('Last Name is required');
+    }
+  );
+
+  test(
+    'all product images should be identical (known bug)',
+    { tag: '@regression' },
+    async ({ inventoryPage }) => {
+      const srcs = await inventoryPage.getItemImageSrcs();
+      expect(srcs).toHaveLength(6);
+      // Inverted: problem_user shows the same broken image for every product
+      const unique = new Set(srcs);
+      expect(unique.size).toBe(1);
+    }
+  );
 });
 
 const GLITCH_USER_LOGIN_TIMEOUT_MS = 15_000;
@@ -79,4 +111,33 @@ test.describe('Performance Glitch User', () => {
     await expect(inventoryPage.inventoryContainer).toBeVisible();
     await expect(inventoryPage.inventoryItems).toHaveCount(6);
   });
+
+  test(
+    'should complete a full purchase despite slow login',
+    { tag: '@regression' },
+    async ({ page, inventoryPage, cartPage, checkoutPage }) => {
+      await test.step('Add item and proceed to cart', async () => {
+        await inventoryPage.addFirstItemToCart();
+        await inventoryPage.goToCart();
+        await expect(cartPage.cartItems).toHaveCount(1);
+      });
+
+      await test.step('Complete checkout', async () => {
+        await cartPage.proceedToCheckout();
+        await checkoutPage.fillCustomerInfo(
+          customer.firstName,
+          customer.lastName,
+          customer.postalCode
+        );
+        await checkoutPage.submitCustomerInfo();
+        await expect(page).toHaveURL('/checkout-step-two.html');
+        await checkoutPage.finish();
+      });
+
+      await test.step('Confirm order complete', async () => {
+        await expect(page).toHaveURL('/checkout-complete.html');
+        await expect(checkoutPage.confirmationHeader).toHaveText('Thank you for your order!');
+      });
+    }
+  );
 });
