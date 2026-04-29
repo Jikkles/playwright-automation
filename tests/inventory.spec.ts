@@ -167,4 +167,57 @@ test.describe('Inventory Page', () => {
     const cartNames = await cartPage.getCartItemNames();
     expect(cartNames).toContain(KNOWN_CART_ITEM);
   });
+
+  test(
+    'should preserve Remove button state after sorting',
+    { tag: '@regression' },
+    async ({ inventoryPage }) => {
+      const names = await inventoryPage.getItemNames();
+      await inventoryPage.addItemToCartByName(names[0]);
+      await inventoryPage.sortBy('za');
+      await expect(inventoryPage.removeFromCartButtons).toHaveCount(1);
+      await expect(inventoryPage.addToCartButtons).toHaveCount(EXPECTED_ITEM_COUNT - 1);
+    }
+  );
+
+  test(
+    'should preserve cart badge count after sorting',
+    { tag: '@regression' },
+    async ({ inventoryPage }) => {
+      await inventoryPage.addFirstNItemsToCart(2);
+      expect(await inventoryPage.getCartBadgeCount()).toBe(2);
+      await inventoryPage.sortBy('za');
+      expect(await inventoryPage.getCartBadgeCount()).toBe(2);
+      await inventoryPage.sortBy('lohi');
+      expect(await inventoryPage.getCartBadgeCount()).toBe(2);
+    }
+  );
+
+  test(
+    'should navigate to product detail page when item image is clicked',
+    { tag: '@regression' },
+    async ({ page, inventoryPage }) => {
+      await inventoryPage.clickFirstItemImage();
+      await expect(page).toHaveURL(/\/inventory-item\.html\?id=\d+/);
+    }
+  );
+
+  test(
+    'all product prices should match $X.XX currency format',
+    { tag: '@regression' },
+    async ({ inventoryPage }) => {
+      const priceTexts = await inventoryPage.getRawItemPriceTexts();
+      for (const text of priceTexts) {
+        expect(text, `Price "${text}" does not match expected $X.XX format`).toMatch(
+          /^\$\d+\.\d{2}$/
+        );
+      }
+    }
+  );
+
+  test('all product names should be unique', { tag: '@regression' }, async ({ inventoryPage }) => {
+    const names = await inventoryPage.getItemNames();
+    const unique = new Set(names);
+    expect(unique.size).toBe(names.length);
+  });
 });

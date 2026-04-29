@@ -47,6 +47,37 @@ test.describe('Checkout', () => {
       await checkoutPage.cancel();
       await expect(page).toHaveURL('/cart.html');
     });
+
+    test(
+      'should accept whitespace-only first name (no server-side trimming)',
+      { tag: '@regression' },
+      async ({ page, checkoutPage }) => {
+        // SauceDemo does not trim whitespace — '   ' is accepted as a valid first name
+        await checkoutPage.fillCustomerInfo('   ', customer.lastName, customer.postalCode);
+        await checkoutPage.submitCustomerInfo();
+        await expect(page).toHaveURL('/checkout-step-two.html');
+      }
+    );
+
+    test(
+      'should accept first name containing special characters',
+      { tag: '@regression' },
+      async ({ page, checkoutPage }) => {
+        await checkoutPage.fillCustomerInfo("O'Brien", customer.lastName, customer.postalCode);
+        await checkoutPage.submitCustomerInfo();
+        await expect(page).toHaveURL('/checkout-step-two.html');
+      }
+    );
+
+    test(
+      'should accept a very long postal code',
+      { tag: '@regression' },
+      async ({ page, checkoutPage }) => {
+        await checkoutPage.fillCustomerInfo(customer.firstName, customer.lastName, 'A'.repeat(50));
+        await checkoutPage.submitCustomerInfo();
+        await expect(page).toHaveURL('/checkout-step-two.html');
+      }
+    );
   });
 
   test.describe('Step 2 - Overview', () => {
@@ -79,6 +110,49 @@ test.describe('Checkout', () => {
     test('should display overview page title', async ({ checkoutPage }) => {
       await expect(checkoutPage.pageTitle).toHaveText('Checkout: Overview');
     });
+
+    test(
+      'tax should be approximately 8% of the subtotal',
+      { tag: '@regression' },
+      async ({ checkoutPage }) => {
+        const subtotal = await checkoutPage.getSubtotal();
+        const tax = await checkoutPage.getTax();
+        expect(tax).toBeCloseTo(subtotal * 0.08, 2);
+      }
+    );
+  });
+
+  test.describe('Completion', () => {
+    test.beforeEach(async ({ page, checkoutPage }) => {
+      // Outer beforeEach leaves us on /checkout-step-one.html; advance through the remaining steps.
+      await checkoutPage.fillCustomerInfo(
+        customer.firstName,
+        customer.lastName,
+        customer.postalCode
+      );
+      await checkoutPage.submitCustomerInfo();
+      await page.waitForURL('/checkout-step-two.html');
+      await checkoutPage.finish();
+      await page.waitForURL('/checkout-complete.html');
+    });
+
+    test(
+      'should display thank you confirmation header',
+      { tag: '@smoke' },
+      async ({ checkoutPage }) => {
+        await expect(checkoutPage.confirmationHeader).toHaveText('Thank you for your order!');
+      }
+    );
+
+    test(
+      'back to products should return to inventory',
+      { tag: '@smoke' },
+      async ({ page, inventoryPage, checkoutPage }) => {
+        await checkoutPage.backToProducts();
+        await expect(page).toHaveURL('/inventory.html');
+        await expect(inventoryPage.inventoryContainer).toBeVisible();
+      }
+    );
   });
 });
 

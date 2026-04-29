@@ -1,4 +1,5 @@
 import { test, expect } from '../fixtures';
+import { customer } from '../data/checkout';
 
 test.describe('Navigation - Burger Menu', () => {
   test.beforeEach(async ({ page }) => {
@@ -57,6 +58,71 @@ test.describe('Navigation - Burger Menu', () => {
       await expect(inventoryPage.burgerMenuReset).toBeVisible();
       await expect(inventoryPage.burgerMenuLogout).toBeVisible();
       // Note: the About link is intentionally excluded — no locator exists in BasePage for it
+    }
+  );
+
+  test(
+    'All Items link should work from checkout step one',
+    { tag: '@regression' },
+    async ({ page, inventoryPage, cartPage, checkoutPage }) => {
+      await inventoryPage.addFirstItemToCart();
+      await inventoryPage.goToCart();
+      await cartPage.proceedToCheckout();
+      await expect(page).toHaveURL('/checkout-step-one.html');
+      await checkoutPage.navigateToAllItems();
+      await expect(page).toHaveURL('/inventory.html');
+      await expect(inventoryPage.inventoryContainer).toBeVisible();
+    }
+  );
+
+  test(
+    'All Items link should work from checkout step two',
+    { tag: '@regression' },
+    async ({ page, inventoryPage, cartPage, checkoutPage }) => {
+      await inventoryPage.addFirstItemToCart();
+      await inventoryPage.goToCart();
+      await cartPage.proceedToCheckout();
+      await checkoutPage.fillCustomerInfo(
+        customer.firstName,
+        customer.lastName,
+        customer.postalCode
+      );
+      await checkoutPage.submitCustomerInfo();
+      await expect(page).toHaveURL('/checkout-step-two.html');
+      await checkoutPage.navigateToAllItems();
+      await expect(page).toHaveURL('/inventory.html');
+      await expect(inventoryPage.inventoryContainer).toBeVisible();
+    }
+  );
+});
+
+test.describe('Navigation - Unauthenticated Access', () => {
+  test.use({ storageState: { cookies: [], origins: [] } });
+
+  test(
+    'should redirect to login from /cart.html when unauthenticated',
+    { tag: '@regression' },
+    async ({ page }) => {
+      await page.goto('/cart.html');
+      await expect(page).toHaveURL('/');
+    }
+  );
+
+  test(
+    'should redirect to login from /checkout-step-one.html when unauthenticated',
+    { tag: '@regression' },
+    async ({ page }) => {
+      await page.goto('/checkout-step-one.html');
+      await expect(page).toHaveURL('/');
+    }
+  );
+
+  test(
+    'should redirect to login from /checkout-step-two.html when unauthenticated',
+    { tag: '@regression' },
+    async ({ page }) => {
+      await page.goto('/checkout-step-two.html');
+      await expect(page).toHaveURL('/');
     }
   );
 });

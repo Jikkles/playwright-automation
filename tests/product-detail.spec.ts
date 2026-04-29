@@ -159,4 +159,52 @@ test.describe('Product Detail Page', () => {
       await expect(inventoryPage.cartBadge).toHaveText('1');
     }
   );
+
+  test(
+    'removing item on detail page should clear badge on return to inventory',
+    { tag: '@regression' },
+    async ({ inventoryPage, productDetailPage }) => {
+      await productDetailPage.addToCart();
+      await expect(productDetailPage.cartBadge).toHaveText('1');
+      await productDetailPage.removeFromCart();
+      await productDetailPage.goBack();
+      await expect(inventoryPage.cartBadge).toBeHidden();
+    }
+  );
+
+  test(
+    'direct URL navigation to a product detail page should work',
+    { tag: '@regression' },
+    async ({ page, productDetailPage }) => {
+      await page.goto('/inventory-item.html?id=4');
+      await expect(page).toHaveURL(/\/inventory-item\.html\?id=4/);
+      await expect(productDetailPage.itemImage).toBeVisible();
+      const name = await productDetailPage.getItemName();
+      expect(name.trim()).not.toBe('');
+    }
+  );
+});
+
+test.describe('Product Detail - All products', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/inventory.html');
+  });
+
+  test(
+    'all 6 products should have accessible detail pages',
+    { tag: '@regression' },
+    async ({ page, inventoryPage, productDetailPage }) => {
+      await expect(inventoryPage.inventoryItems).not.toHaveCount(0);
+      const names = await inventoryPage.getItemNames();
+
+      for (const name of names) {
+        await inventoryPage.clickItemByName(name);
+        await expect(page).toHaveURL(/\/inventory-item\.html\?id=\d+/);
+        const detailName = await productDetailPage.getItemName();
+        expect(detailName, `Detail page name mismatch for "${name}"`).toBe(name);
+        await productDetailPage.goBack();
+        await expect(page).toHaveURL('/inventory.html');
+      }
+    }
+  );
 });

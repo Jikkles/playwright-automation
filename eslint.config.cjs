@@ -21,6 +21,7 @@ module.exports = [
     ignores: [
       'node_modules/',
       'playwright-report/',
+      'allure-report/',
       'test-results/',
       '.auth/',
       'eslint.config.cjs',

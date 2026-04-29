@@ -54,4 +54,51 @@ test.describe('Login Page', () => {
     await loginPage.dismissError();
     await expect(loginPage.errorMessage).toBeHidden();
   });
+
+  test(
+    'should show error for valid username with wrong password',
+    { tag: '@regression' },
+    async ({ loginPage }) => {
+      await loginPage.login(credentials.standardUser.username, 'wrong_password');
+      await expect(loginPage.errorMessage).toContainText('Username and password do not match');
+    }
+  );
+
+  test(
+    'should show error for whitespace-only username',
+    { tag: '@regression' },
+    async ({ loginPage }) => {
+      // SauceDemo does not trim whitespace — '   ' is treated as a username that does not match any user
+      await loginPage.login('   ', credentials.standardUser.password);
+      await expect(loginPage.errorMessage).toContainText('Username and password do not match');
+    }
+  );
+
+  test(
+    'should show error for whitespace-only password',
+    { tag: '@regression' },
+    async ({ loginPage }) => {
+      await loginPage.login(credentials.standardUser.username, '   ');
+      await expect(loginPage.errorMessage).toContainText('Username and password do not match');
+    }
+  );
+
+  test(
+    'should handle extremely long credentials without crashing',
+    { tag: '@regression' },
+    async ({ page, loginPage }) => {
+      const longString = 'a'.repeat(500);
+      await loginPage.login(longString, longString);
+      await expect(loginPage.errorMessage).toBeVisible();
+      await expect(page).toHaveURL('/');
+    }
+  );
+
+  test(
+    'error message should be hidden on initial page load',
+    { tag: '@regression' },
+    async ({ loginPage }) => {
+      await expect(loginPage.errorMessage).toBeHidden();
+    }
+  );
 });
