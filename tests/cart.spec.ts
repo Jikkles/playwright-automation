@@ -150,4 +150,62 @@ test.describe('Cart', () => {
     expect(remaining).not.toContain(itemNames[0]);
     expect(remaining).toContain(itemNames[1]);
   });
+
+  test(
+    'checkout button should be visible on an empty cart',
+    { tag: '@regression' },
+    async ({ inventoryPage, cartPage }) => {
+      await inventoryPage.goToCart();
+      await expect(cartPage.checkoutButton).toBeVisible();
+    }
+  );
+
+  test(
+    'proceeding to checkout from an empty cart should reach step one',
+    { tag: '@regression' },
+    async ({ page, inventoryPage, cartPage }) => {
+      await inventoryPage.goToCart();
+      await cartPage.proceedToCheckout();
+      await expect(page).toHaveURL('/checkout-step-one.html');
+    }
+  );
+
+  test(
+    'cart contents should persist after page refresh',
+    { tag: '@regression' },
+    async ({ page, inventoryPage, cartPage }) => {
+      const names = await inventoryPage.getItemNames();
+      await inventoryPage.addItemToCartByName(names[0]);
+      await page.reload();
+      await expect(inventoryPage.cartBadge).toHaveText('1');
+      await inventoryPage.goToCart();
+      const cartNames = await cartPage.getCartItemNames();
+      expect(cartNames).toContain(names[0]);
+    }
+  );
+
+  test(
+    'cart badge should decrement sequentially as items are removed from cart page',
+    { tag: '@regression' },
+    async ({ inventoryPage, cartPage }) => {
+      await inventoryPage.addFirstNItemsToCart(3);
+      await inventoryPage.goToCart();
+
+      await test.step('remove first item — badge shows 2', async () => {
+        await cartPage.removeFirstItem();
+        await expect(cartPage.cartBadge).toHaveText('2');
+      });
+
+      await test.step('remove second item — badge shows 1', async () => {
+        await cartPage.removeFirstItem();
+        await expect(cartPage.cartBadge).toHaveText('1');
+      });
+
+      await test.step('remove third item — badge disappears', async () => {
+        await cartPage.removeFirstItem();
+        await expect(cartPage.cartItems).toHaveCount(0);
+        await expect(cartPage.cartBadge).toBeHidden();
+      });
+    }
+  );
 });
