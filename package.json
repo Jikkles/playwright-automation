@@ -37,10 +37,10 @@
     "@types/node": "^25.6.0",
     "allure-commandline": "^2.38.1",
     "allure-playwright": "^3.7.2",
-    "eslint": "^10.2.1",
+    "eslint": "^10.3.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-playwright": "^2.10.2",
     "prettier": "^3.8.3",
-    "typescript-eslint": "^8.59.1"
+    "typescript-eslint": "^8.59.2"
   }
 }
