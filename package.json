@@ -34,7 +34,7 @@
   "devDependencies": {
     "@axe-core/playwright": "^4.11.3",
     "@playwright/test": "^1.60.0",
-    "@types/node": "^25.6.0",
+    "@types/node": "^25.7.0",
     "allure-commandline": "^2.40.0",
     "allure-playwright": "^3.8.0",
     "eslint": "^10.3.0",
